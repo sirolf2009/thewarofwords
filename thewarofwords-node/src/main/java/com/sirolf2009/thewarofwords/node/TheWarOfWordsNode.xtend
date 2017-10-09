@@ -43,7 +43,7 @@ class TheWarOfWordsNode extends Node {
 				System.exit(-1)
 				return null //wow, java
 			} else {
-				return new InetSocketAddress(data.get(0), Integer.parseInt(data.get(2)))
+				return new InetSocketAddress(data.get(0), Integer.parseInt(data.get(1)))
 			}
 		]
 
