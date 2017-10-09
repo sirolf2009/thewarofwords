@@ -1,10 +1,10 @@
 package com.sirolf2009.thewarofwords.node
 
 import com.esotericsoftware.kryo.Kryo
-import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Configuration
 import com.sirolf2009.objectchain.node.Node
+import com.sirolf2009.thewarofwords.common.State
 import java.io.File
 import java.math.BigInteger
 import java.net.InetSocketAddress
@@ -13,6 +13,7 @@ import java.time.Duration
 import java.util.List
 import org.apache.logging.log4j.core.tools.picocli.CommandLine
 import org.slf4j.LoggerFactory
+import java.util.HashMap
 
 class TheWarOfWordsNode extends Node {
 
@@ -23,7 +24,7 @@ class TheWarOfWordsNode extends Node {
 	}
 
 	def static configuration() {
-		return new Configuration(2016, Duration.ofMinutes(10), 10, 2048, new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16), new State())
+		return new Configuration(2016, Duration.ofMinutes(10), 10, 2048, new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16), new State(new HashMap(), new HashMap(), new HashMap()))
 	}
 
 	def static kryo() {
