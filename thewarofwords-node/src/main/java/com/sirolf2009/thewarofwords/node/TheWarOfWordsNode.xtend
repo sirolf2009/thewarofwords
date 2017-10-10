@@ -5,15 +5,21 @@ import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Configuration
 import com.sirolf2009.objectchain.node.Node
 import com.sirolf2009.thewarofwords.common.State
+import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.common.model.SourceType
+import com.sirolf2009.thewarofwords.common.model.Topic
+import com.sirolf2009.thewarofwords.common.serializer.SerializerSource
+import com.sirolf2009.thewarofwords.common.serializer.SerializerSourceType
+import com.sirolf2009.thewarofwords.common.serializer.SerializerTopic
 import java.io.File
 import java.math.BigInteger
 import java.net.InetSocketAddress
 import java.security.KeyPair
 import java.time.Duration
+import java.util.HashMap
 import java.util.List
 import org.apache.logging.log4j.core.tools.picocli.CommandLine
 import org.slf4j.LoggerFactory
-import java.util.HashMap
 
 class TheWarOfWordsNode extends Node {
 
@@ -29,6 +35,9 @@ class TheWarOfWordsNode extends Node {
 
 	def static kryo() {
 		val kryo = new Kryo()
+		kryo.register(SourceType, new SerializerSourceType())
+		kryo.register(Source, new SerializerSource())
+		kryo.register(Topic, new SerializerTopic())
 		return kryo
 	}
 
