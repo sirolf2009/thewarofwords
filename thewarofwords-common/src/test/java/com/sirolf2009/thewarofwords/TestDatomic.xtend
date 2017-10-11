@@ -1,11 +1,16 @@
 package com.sirolf2009.thewarofwords
 
 import datomic.Connection
+import datomic.Database
 import datomic.Peer
-import java.util.UUID
-import org.junit.Test
 import datomic.Util
 import java.io.StringReader
+import java.util.UUID
+import org.junit.Test
+
+import static datomic.Connection.*
+import static datomic.Peer.*
+import static datomic.Util.*
 
 class TestDatomic {
 	
@@ -14,14 +19,56 @@ class TestDatomic {
 	def void test() {
 		val conn = scratchConnection()
 		val txes = Util.readAll(new StringReader('''
-		[{:db/id #db/id[:db.part/db]
-		  :db/ident :account/balance
-		  :db/valueType :db.type/long
+		[{:db/ident :topic/name
+		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/one
-		:db.install/_attribute :db.part/db}]'''))
+		  :db.install/_attribute :db.part/db}
+		 {:db/ident :topic/tags
+		  :db/valueType :db.type/string
+		  :db/cardinality :db.cardinality/many
+		  :db.install/_attribute :db.part/db}]'''))
 		txes.forEach[
-			println(conn.transact(it).get())
+			println("Schema: "+conn.transact(it).get())
 		]
+		
+		val put = Util.readAll(new StringReader('''
+		[{:topic/name "testTopic"
+		  :topic/tags ["test" "datomic"]}]'''))
+		put.forEach[
+			println("testTopic:" +conn.transact(it).get())
+		]
+		
+		val topic = tempid(":db.part/user")
+		val tx = conn.transact(list(
+			map(":db/id", topic, ":topic/name", "test"),
+			map(":db/id", topic, ":topic/tags", "test"),
+			map(":db/id", topic, ":topic/tags", "topic")
+		)).get()
+		println("topic: "+tx)
+		
+		println(query('''
+		[:find ?e ?topic-name
+		 :where [?e :topic/tags ?topic-name]]'''.toString(), conn.db))
+		
+		println(query('''
+		[:find ?e ?topic-name
+		 :where [?e :topic/tags ?topic-name]]'''.toString(), tx.get(DB_AFTER)))
+		
+		println(query('''
+		[:find ?e
+		 :in $ ?name
+		 :where [?e :topic/name ?name]]'''.toString(), conn.db, "testTopic"))
+		 
+		println(query('''
+		[:find ?name
+		 :in $ ?tags
+		 :where [?e :topic/name ?name]
+		 		[?e :topic/tags ?tags]]'''.toString(), conn.db, "test"))
+		println(query('''
+		[:find ?name
+		 :in $ ?tags
+		 :where [?e :topic/name ?name]
+		 		[?e :topic/tags ?tags]]'''.toString(), conn.db, "datomic"))
 	}
 
 	def static Connection scratchConnection() {

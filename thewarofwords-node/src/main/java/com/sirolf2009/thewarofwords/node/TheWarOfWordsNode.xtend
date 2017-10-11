@@ -11,12 +11,12 @@ import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.common.serializer.SerializerSource
 import com.sirolf2009.thewarofwords.common.serializer.SerializerSourceType
 import com.sirolf2009.thewarofwords.common.serializer.SerializerTopic
+import datomic.Peer
 import java.io.File
 import java.math.BigInteger
 import java.net.InetSocketAddress
 import java.security.KeyPair
 import java.time.Duration
-import java.util.HashMap
 import java.util.List
 import org.apache.logging.log4j.core.tools.picocli.CommandLine
 import org.slf4j.LoggerFactory
@@ -30,7 +30,11 @@ class TheWarOfWordsNode extends Node {
 	}
 
 	def static configuration() {
-		return new Configuration(2016, Duration.ofMinutes(10), 10, 2048, new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16), new State(new HashMap(), new HashMap(), new HashMap()))
+		val uri = "datomic:mem://thewarofwords"
+		Peer.createDatabase(uri)
+		val conn = Peer.connect(uri)
+		Schema.addSchema(conn)
+		return new Configuration(2016, Duration.ofMinutes(10), 10, 2048, new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16), new State(conn, conn.db))
 	}
 
 	def static kryo() {

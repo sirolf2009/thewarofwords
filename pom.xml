@@ -10,7 +10,9 @@
 	<modules>
 		<module>thewarofwords-common</module>
 		<module>thewarofwords-node</module>
-	</modules>
+    <module>thewarofwords-restnode</module>
+    <module>thewarofwords-miner</module>
+  </modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
