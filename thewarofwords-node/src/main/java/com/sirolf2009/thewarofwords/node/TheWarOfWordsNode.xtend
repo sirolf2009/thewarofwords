@@ -13,13 +13,11 @@ import com.sirolf2009.thewarofwords.common.serializer.SerializerSourceType
 import com.sirolf2009.thewarofwords.common.serializer.SerializerTopic
 import datomic.Peer
 import java.io.File
-import java.math.BigInteger
 import java.net.InetSocketAddress
 import java.security.KeyPair
-import java.time.Duration
 import java.util.List
-import org.apache.logging.log4j.core.tools.picocli.CommandLine
 import org.slf4j.LoggerFactory
+import picocli.CommandLine
 
 class TheWarOfWordsNode extends Node {
 
@@ -34,7 +32,7 @@ class TheWarOfWordsNode extends Node {
 		Peer.createDatabase(uri)
 		val conn = Peer.connect(uri)
 		Schema.addSchema(conn)
-		return new Configuration(2016, Duration.ofMinutes(10), 10, 2048, new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16), new State(conn, conn.db))
+		return new Configuration.Builder().setGenesisState(new State(conn, conn.db)).build()
 	}
 
 	def static kryo() {
@@ -46,7 +44,7 @@ class TheWarOfWordsNode extends Node {
 	}
 
 	def static void main(String[] args) {
-		val options = picocli.CommandLine.populateCommand(new Options(), args)
+		val options = CommandLine.populateCommand(new Options(), args)
 
 		val trackers = options.trackers.map [
 			val data = split(":")

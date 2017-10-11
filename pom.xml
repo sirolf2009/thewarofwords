@@ -12,6 +12,7 @@
 		<module>thewarofwords-node</module>
     <module>thewarofwords-restnode</module>
     <module>thewarofwords-miner</module>
+    <module>thewarofwords-website</module>
   </modules>
 
 	<properties>

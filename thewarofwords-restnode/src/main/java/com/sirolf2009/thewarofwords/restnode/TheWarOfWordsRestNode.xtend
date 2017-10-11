@@ -1,6 +1,10 @@
 package com.sirolf2009.thewarofwords.restnode
 
 import com.sirolf2009.objectchain.common.crypto.Keys
+import com.sirolf2009.objectchain.common.model.Mutation
+import com.sirolf2009.objectchain.network.node.NewMutation
+import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsNode
 import java.io.File
 import java.net.InetSocketAddress
@@ -9,11 +13,7 @@ import java.util.List
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
 
-import static spark.Spark.*;
-import com.sirolf2009.thewarofwords.common.model.Source
-import com.sirolf2009.thewarofwords.common.model.SourceType
-import com.sirolf2009.objectchain.common.model.Mutation
-import com.sirolf2009.objectchain.network.node.NewMutation
+import static spark.Spark.*
 
 class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 
@@ -29,9 +29,11 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 	override start() {
 		super.start()
 		port(restPort)
+		
 		get("/lastblock") [req,res|
 			kryoPool.run[blockchain.mainBranch.lastBlock.toString(it)]
 		]
+		
 		post("/source") [ req, res |
 			val sourceType = req.queryParams("sourceType")
 			val source = req.queryParams("source")
@@ -44,7 +46,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 				res.status(400)
 				return "missing source param"
 			}
-			val mutation = new Mutation(new Source(SourceType.valueOf(sourceType), source, if(comment !== null) comment else ""), keys)
+			val mutation = new Mutation(new Source(SourceType.valueOf(sourceType), source.sanitize, sanitize(if(comment !== null) comment else "")), keys)
 			floatingMutations.add(mutation)
 			val message = new NewMutation() => [
 				it.mutation = mutation
@@ -53,6 +55,10 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 			res.status(200)
 			return kryoPool.run[mutation.toString(it)]
 		]
+	}
+	
+	def static sanitize(String string) {
+		return string.replace("\"", "\\\"").replace("\'", "\\\'")
 	}
 
 	def static void main(String[] args) {
