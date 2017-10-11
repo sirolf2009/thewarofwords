@@ -3,11 +3,12 @@ package com.sirolf2009.thewarofwords.node
 import datomic.Connection
 import datomic.Util
 import java.io.StringReader
+import java.util.List
 
 class Schema {
 	
 	def static addSchema(Connection conn) {
-		val txes = Util.readAll(new StringReader('''
+		val List<List<?>> txes = Util.readAll(new StringReader('''
 		[{:db/ident :topic/name
 		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/one}

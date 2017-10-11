@@ -7,11 +7,12 @@ import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.Topic
 import datomic.Connection
 import datomic.Database
-import org.eclipse.xtend.lib.annotations.Data
-import java.io.StringReader
 import datomic.Util
-import org.slf4j.LoggerFactory
+import java.io.StringReader
+import java.util.List
 import java.util.concurrent.atomic.AtomicReference
+import org.eclipse.xtend.lib.annotations.Data
+import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
@@ -37,12 +38,14 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		].toList()
 
 		//TODO references
+		//TODO prepared statements
 		
 		val query = (topics+sources).join("[", "\n", "]", [toString()])
 		log.info("executing query {}", query)
 		val reader = new StringReader(query)
 		val lastTx = new AtomicReference()
-		Util.readAll(reader).forEach[
+		val List<List<?>> statements = Util.readAll(reader)
+		statements.forEach[
 			lastTx.set(connection.transact(it).get())
 		]
 
