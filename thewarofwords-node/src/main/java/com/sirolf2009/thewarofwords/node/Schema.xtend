@@ -15,8 +15,16 @@ class Schema {
 		 {:db/ident :topic/tags
 		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/many}
-		  
+		  		  
 		 {:db/ident :source/source
+		  :db/valueType :db.type/string
+		  :db/cardinality :db.cardinality/one}
+		  
+		 {:db/ident :source/comment
+		  :db/valueType :db.type/string
+		  :db/cardinality :db.cardinality/one}
+		  
+		 {:db/ident :source/owner
 		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/one}
 		  

@@ -10,12 +10,13 @@ import com.sirolf2009.thewarofwords.common.model.SourceType
 class SerializerSource extends Serializer<Source> {
 	
 	override read(Kryo kryo, Input input, Class<Source> type) {
-		return new Source(kryo.readObject(input, SourceType), input.readString)
+		return new Source(kryo.readObject(input, SourceType), input.readString, input.readString)
 	}
 	
 	override write(Kryo kryo, Output output, Source object) {
 		kryo.writeObject(output, object.sourceType)
 		output.writeString(object.source)
+		output.writeString(object.comment)
 	}
 	
 }

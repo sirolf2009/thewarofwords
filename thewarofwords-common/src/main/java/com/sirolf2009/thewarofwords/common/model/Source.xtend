@@ -6,5 +6,6 @@ import org.eclipse.xtend.lib.annotations.Data
 	
 	val SourceType sourceType
 	val String source
+	val String comment
 	
 }

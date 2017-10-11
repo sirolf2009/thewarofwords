@@ -35,6 +35,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 		post("/source") [ req, res |
 			val sourceType = req.queryParams("sourceType")
 			val source = req.queryParams("source")
+			val comment = req.queryParams("comment")
 			if(sourceType === null) {
 				res.status(400)
 				return "missing sourceType param"
@@ -43,7 +44,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 				res.status(400)
 				return "missing source param"
 			}
-			val mutation = new Mutation(new Source(SourceType.valueOf(sourceType), source), keys)
+			val mutation = new Mutation(new Source(SourceType.valueOf(sourceType), source, if(comment !== null) comment else ""), keys)
 			floatingMutations.add(mutation)
 			val message = new NewMutation() => [
 				it.mutation = mutation

@@ -13,6 +13,8 @@ import datomic.Util
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicReference
 
+import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+
 @Data class State implements IState {
 
 	static val log = LoggerFactory.getLogger(State)
@@ -25,10 +27,13 @@ import java.util.concurrent.atomic.AtomicReference
 				{:topic/name "«name»"
 				 «tags.map[''':topic/tags «it»'''].join("\n")»]}'''
 		].toList()
-		val sources = block.mutations.filter[object instanceof Source].map[object as Source].map[
+		val sources = block.mutations.filter[object instanceof Source].map[mutation|
+			val it = mutation.object as Source
 			'''
 				{:source/source "«source»"
-				 :source/type "«sourceType»"}'''
+				 :source/type "«sourceType»"
+				 :source/comment "«comment»"
+				 :source/owner "«mutation.publicKey.encoded.toHexString()»"}'''
 		].toList()
 
 		//TODO references
