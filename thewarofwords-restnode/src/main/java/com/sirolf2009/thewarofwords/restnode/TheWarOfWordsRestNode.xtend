@@ -3,17 +3,22 @@ package com.sirolf2009.thewarofwords.restnode
 import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Mutation
 import com.sirolf2009.objectchain.network.node.NewMutation
+import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
+import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsNode
 import java.io.File
 import java.net.InetSocketAddress
+import java.net.URL
 import java.security.KeyPair
 import java.util.List
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
 
 import static spark.Spark.*
+
+import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 
@@ -46,7 +51,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 				res.status(400)
 				return "missing source param"
 			}
-			val mutation = new Mutation(new Source(SourceType.valueOf(sourceType), source.sanitize, sanitize(if(comment !== null) comment else "")), keys)
+			val mutation = kryoPool.run[kryo| new Mutation(new Source(SourceType.valueOf(sourceType), new URL(source.sanitize), sanitize(if(comment !== null) comment else "")), kryo, keys)]
 			floatingMutations.add(mutation)
 			val message = new NewMutation() => [
 				it.mutation = mutation
@@ -55,6 +60,46 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 			res.status(200)
 			return kryoPool.run[mutation.toString(it)]
 		]
+		
+		post("/topic") [ req, res |
+			val name = req.queryParams("name")
+			val tags = req.queryParamsValues("tag")
+			if(name === null) {
+				res.status(400)
+				return "missing name param"
+			}
+			val mutation = kryoPool.run[kryo| new Mutation(new Topic(name.sanitize(), if(tags === null) #[] else tags), kryo, keys)]
+			floatingMutations.add(mutation)
+			val message = new NewMutation() => [
+				it.mutation = mutation
+			]
+			message.broadcast()
+			res.status(200)
+			return kryoPool.run[mutation.toString(it)]
+		]
+		
+		post("/refer") [ req, res |
+			val topic = req.queryParams("topic")
+			val source = req.queryParams("source")
+			if(topic === null) {
+				res.status(400)
+				return "missing topic param"
+			}
+			if(source === null) {
+				res.status(400)
+				return "missing source param"
+			}
+			val mutation = kryoPool.run[kryo| new Mutation(new Reference(topic.toByteArray(), source.toByteArray()), kryo, keys)]
+			floatingMutations.add(mutation)
+			val message = new NewMutation() => [
+				it.mutation = mutation
+			]
+			message.broadcast()
+			res.status(200)
+			return kryoPool.run[mutation.toString(it)]
+		]
+		
+		log.info("Hosting REST api on port {}", restPort)
 	}
 	
 	def static sanitize(String string) {

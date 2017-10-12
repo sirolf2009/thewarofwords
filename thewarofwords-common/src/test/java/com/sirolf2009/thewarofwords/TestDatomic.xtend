@@ -1,10 +1,10 @@
 package com.sirolf2009.thewarofwords
 
 import datomic.Connection
-import datomic.Database
 import datomic.Peer
 import datomic.Util
 import java.io.StringReader
+import java.util.List
 import java.util.UUID
 import org.junit.Test
 
@@ -16,9 +16,9 @@ class TestDatomic {
 	
 	@Test
 	//https://github.com/Datomic/datomic-java-examples/blob/master/src/java/datomic/samples/CompareAndSwap.java
-	def void test() {
+	def void test() {		
 		val conn = scratchConnection()
-		val txes = Util.readAll(new StringReader('''
+		val List<List<?>> txes = Util.readAll(new StringReader('''
 		[{:db/ident :topic/name
 		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/one
@@ -31,7 +31,7 @@ class TestDatomic {
 			println("Schema: "+conn.transact(it).get())
 		]
 		
-		val put = Util.readAll(new StringReader('''
+		val List<List<?>> put = Util.readAll(new StringReader('''
 		[{:topic/name "testTopic"
 		  :topic/tags ["test" "datomic"]}]'''))
 		put.forEach[

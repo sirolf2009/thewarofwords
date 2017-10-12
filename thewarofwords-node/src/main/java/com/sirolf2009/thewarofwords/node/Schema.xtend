@@ -9,13 +9,27 @@ class Schema {
 	
 	def static addSchema(Connection conn) {
 		val List<List<?>> txes = Util.readAll(new StringReader('''
-		[{:db/ident :topic/name
+		[{:db/ident :topic/hash
+		  :db/valueType :db.type/string
+		  :db/cardinality :db.cardinality/one
+		  :db/unique :db.unique/identity}
+		
+		 {:db/ident :topic/name
 		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/one}
 		  
 		 {:db/ident :topic/tags
 		  :db/valueType :db.type/string
 		  :db/cardinality :db.cardinality/many}
+		  		  
+		 {:db/ident :topic/refers
+		  :db/valueType :db.type/string
+		  :db/cardinality :db.cardinality/many}
+		  		  		  
+		 {:db/ident :source/hash
+		  :db/valueType :db.type/string
+		  :db/cardinality :db.cardinality/one
+		  :db/unique :db.unique/identity}
 		  		  
 		 {:db/ident :source/source
 		  :db/valueType :db.type/string

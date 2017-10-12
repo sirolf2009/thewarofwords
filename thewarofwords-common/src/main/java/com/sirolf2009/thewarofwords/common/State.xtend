@@ -15,6 +15,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+import com.sirolf2009.thewarofwords.common.model.Reference
 
 @Data class State implements IState {
 
@@ -23,24 +24,32 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	val Database database
 
 	override apply(Kryo kryo, Block block) {
-		val topics = block.mutations.filter[object instanceof Topic].map[object as Topic].map[
+		val topics = block.mutations.filter[object instanceof Topic].map[mutation|
+			val it = mutation.object as Topic
 			'''
-				{:topic/name "«name»"
-				 «tags.map[''':topic/tags «it»'''].join("\n")»]}'''
+				{:topic/hash "«mutation.hash(kryo).toHexString()»"
+				 :topic/name "«name»"}'''
 		].toList()
 		val sources = block.mutations.filter[object instanceof Source].map[mutation|
 			val it = mutation.object as Source
 			'''
-				{:source/source "«source»"
+				{:source/hash "«mutation.hash(kryo).toHexString()»"
+				 :source/source "«source»"
 				 :source/type "«sourceType»"
 				 :source/comment "«comment»"
 				 :source/owner "«mutation.publicKey.encoded.toHexString()»"}'''
 		].toList()
 
-		//TODO references
+		val references = block.mutations.filter[object instanceof Reference].map[mutation|
+			val it = mutation.object as Reference
+			'''
+			 {:db/id [:topic/hash «topic.toHexString()»]
+			  :topic/refers «source.toHexString()»}'''
+		].toList()
+		//TODO tags
 		//TODO prepared statements
 		
-		val query = (topics+sources).join("[", "\n", "]", [toString()])
+		val query = (topics+sources+references).join("[", "\n", "]", [toString()])
 		log.info("executing query {}", query)
 		val reader = new StringReader(query)
 		val lastTx = new AtomicReference()
@@ -50,6 +59,14 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		]
 
 		return new State(connection, lastTx.get().get(Connection.DB_AFTER) as Database)
+	}
+	
+	def getSource(List<Byte> hash) {
+		
+	}
+	
+	def getSource(String hash) {
+		
 	}
 
 }

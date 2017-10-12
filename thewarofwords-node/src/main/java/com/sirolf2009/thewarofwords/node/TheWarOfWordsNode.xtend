@@ -3,6 +3,7 @@ package com.sirolf2009.thewarofwords.node
 import com.esotericsoftware.kryo.Kryo
 import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Configuration
+import com.sirolf2009.objectchain.common.model.Mutation
 import com.sirolf2009.objectchain.node.Node
 import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.thewarofwords.common.model.Source
@@ -25,6 +26,18 @@ class TheWarOfWordsNode extends Node {
 
 	new(List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
 		super(log, configuration(), [kryo()], trackers, nodePort, keys)
+	}
+	
+	override isValid(Mutation mutation) {
+		if(mutation.object instanceof Source) {
+			try {
+				(mutation.object as Source).verify()
+				return true
+			} catch(Exception e) {
+				log.error("Failed to verify source mutation", e)
+				return false
+			}
+		}
 	}
 
 	def static configuration() {
