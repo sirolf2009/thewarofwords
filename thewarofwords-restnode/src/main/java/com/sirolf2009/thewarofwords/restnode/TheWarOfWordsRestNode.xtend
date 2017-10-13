@@ -1,8 +1,6 @@
 package com.sirolf2009.thewarofwords.restnode
 
 import com.sirolf2009.objectchain.common.crypto.Keys
-import com.sirolf2009.objectchain.common.model.Mutation
-import com.sirolf2009.objectchain.network.node.NewMutation
 import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
@@ -51,12 +49,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 				res.status(400)
 				return "missing source param"
 			}
-			val mutation = kryoPool.run[kryo| new Mutation(new Source(SourceType.valueOf(sourceType), new URL(source.sanitize), sanitize(if(comment !== null) comment else "")), kryo, keys)]
-			floatingMutations.add(mutation)
-			val message = new NewMutation() => [
-				it.mutation = mutation
-			]
-			message.broadcast()
+			val mutation = submitMutation(new Source(SourceType.valueOf(sourceType), new URL(source.sanitize), sanitize(if(comment !== null) comment else "")))
 			res.status(200)
 			return kryoPool.run[mutation.toString(it)]
 		]
@@ -68,12 +61,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 				res.status(400)
 				return "missing name param"
 			}
-			val mutation = kryoPool.run[kryo| new Mutation(new Topic(name.sanitize(), if(tags === null) #[] else tags), kryo, keys)]
-			floatingMutations.add(mutation)
-			val message = new NewMutation() => [
-				it.mutation = mutation
-			]
-			message.broadcast()
+			val mutation = submitMutation(new Topic(name.sanitize(), if(tags === null) #[] else tags))
 			res.status(200)
 			return kryoPool.run[mutation.toString(it)]
 		]
@@ -89,12 +77,7 @@ class TheWarOfWordsRestNode extends TheWarOfWordsNode {
 				res.status(400)
 				return "missing source param"
 			}
-			val mutation = kryoPool.run[kryo| new Mutation(new Reference(topic.toByteArray(), source.toByteArray()), kryo, keys)]
-			floatingMutations.add(mutation)
-			val message = new NewMutation() => [
-				it.mutation = mutation
-			]
-			message.broadcast()
+			val mutation = submitMutation(new Reference(topic.toByteArray(), source.toByteArray()))
 			res.status(200)
 			return kryoPool.run[mutation.toString(it)]
 		]

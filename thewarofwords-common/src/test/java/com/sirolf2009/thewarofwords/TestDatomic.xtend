@@ -1,5 +1,6 @@
 package com.sirolf2009.thewarofwords
 
+import com.sirolf2009.thewarofwords.common.Schema
 import datomic.Connection
 import datomic.Peer
 import datomic.Util
@@ -13,6 +14,39 @@ import static datomic.Peer.*
 import static datomic.Util.*
 
 class TestDatomic {
+	
+	@Test
+	def void testSchema() {
+		val conn = scratchConnection()
+		Schema.addSchema(conn)
+		val topic = '''
+		{:topic/hash "a52c1f10db3732590af183e06745381933440f4751130ecbfc55d4ed5ce7a943"
+		 :topic/name "Awesome Things"
+		 :topic/tags ["a" "b"]}'''
+		val source = '''
+		{:source/hash "f780a86f71959c8c77fc78a0322e7d33e6b5d1aa44734c1972958b5337e49ead"
+		 :source/source "https://github.com/sirolf2009/thewarofwords"
+		 :source/type "CITATION"
+		 :source/comment "Look at this!"
+		 :source/owner "30819f300d06092a864886f70d010101050003818d003081890281810094c3152b2dd7d1d350d09631d4add2c1aad1c193da09f576abeb43c54900d13a3c8f54564ca3a28079f03ce8df3ae0804bc3a00da868584fc9fa6edf15907d3fd1692b0b44abcd42098c5f3c01eae28bea2272e4a45c7393a8df525045262a86c10b237b8d8606af89d78d829afda5792350da77e0d3552d4ea4f6dffd91aefd0203010001"}'''
+		val reference = 
+		'''
+		{:db/id [:topic/hash "a52c1f10db3732590af183e06745381933440f4751130ecbfc55d4ed5ce7a943"]
+		 :topic/refers "f780a86f71959c8c77fc78a0322e7d33e6b5d1aa44734c1972958b5337e49ead"}''' 
+		 
+		 println(conn.transact(Util.readAll(new StringReader(topic))).get())
+		 println(conn.transact(Util.readAll(new StringReader(source))).get())
+		 println(conn.transact(Util.readAll(new StringReader(reference))).get())
+		 
+		 val getSources = '''
+		 [:find ?e ?n ?t ?r
+		  :where [?e :topic/hash "a52c1f10db3732590af183e06745381933440f4751130ecbfc55d4ed5ce7a943"]
+		  		 [?e :topic/name ?n]
+		  		 [?e :topic/tags ?t]
+		  		 [?e :topic/refers ?r]] 
+		 '''
+		 println(query(getSources, conn.db))
+	}
 	
 	@Test
 	//https://github.com/Datomic/datomic-java-examples/blob/master/src/java/datomic/samples/CompareAndSwap.java

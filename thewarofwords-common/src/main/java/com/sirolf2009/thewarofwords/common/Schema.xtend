@@ -1,4 +1,4 @@
-package com.sirolf2009.thewarofwords.node
+package com.sirolf2009.thewarofwords.common
 
 import datomic.Connection
 import datomic.Util

@@ -5,10 +5,13 @@ import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Configuration
 import com.sirolf2009.objectchain.common.model.Mutation
 import com.sirolf2009.objectchain.node.Node
+import com.sirolf2009.thewarofwords.common.Schema
 import com.sirolf2009.thewarofwords.common.State
+import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
+import com.sirolf2009.thewarofwords.common.serializer.SerializerReference
 import com.sirolf2009.thewarofwords.common.serializer.SerializerSource
 import com.sirolf2009.thewarofwords.common.serializer.SerializerSourceType
 import com.sirolf2009.thewarofwords.common.serializer.SerializerTopic
@@ -53,6 +56,7 @@ class TheWarOfWordsNode extends Node {
 		kryo.register(SourceType, new SerializerSourceType())
 		kryo.register(Source, new SerializerSource())
 		kryo.register(Topic, new SerializerTopic())
+		kryo.register(Reference, new SerializerReference())
 		return kryo
 	}
 

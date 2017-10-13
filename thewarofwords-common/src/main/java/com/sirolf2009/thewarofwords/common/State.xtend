@@ -28,7 +28,11 @@ import com.sirolf2009.thewarofwords.common.model.Reference
 			val it = mutation.object as Topic
 			'''
 				{:topic/hash "«mutation.hash(kryo).toHexString()»"
-				 :topic/name "«name»"}'''
+				 :topic/name "«name»"
+				 «IF !tags.empty»
+				 :topic/tags [«tags.map['''"«it»"'''].join(" ")»]
+				 «ENDIF»
+				 }'''
 		].toList()
 		val sources = block.mutations.filter[object instanceof Source].map[mutation|
 			val it = mutation.object as Source
@@ -43,10 +47,9 @@ import com.sirolf2009.thewarofwords.common.model.Reference
 		val references = block.mutations.filter[object instanceof Reference].map[mutation|
 			val it = mutation.object as Reference
 			'''
-			 {:db/id [:topic/hash «topic.toHexString()»]
-			  :topic/refers «source.toHexString()»}'''
+			 {:db/id [:topic/hash "«topic.toHexString()»"]
+			  :topic/refers "«source.toHexString()»"}'''
 		].toList()
-		//TODO tags
 		//TODO prepared statements
 		
 		val query = (topics+sources+references).join("[", "\n", "]", [toString()])
