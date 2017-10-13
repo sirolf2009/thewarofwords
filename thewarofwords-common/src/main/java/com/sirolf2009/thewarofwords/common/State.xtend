@@ -75,7 +75,6 @@ import java.util.stream.Collectors
 		        [?e topic/name ?n]
 		        [?e topic/tags ?t]]'''
 		val response = Peer.query(query, database) as HashSet<PersistentVector>
-		println(response)
 		val responseById = response.groupBy[get(0) as String]
 		responseById.mapValues[
 			val name = get(0).get(1) as String
