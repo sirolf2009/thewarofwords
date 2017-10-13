@@ -4,10 +4,13 @@ import com.vaadin.server.Resource
 import com.vaadin.ui.Image
 import com.vaadin.ui.Label
 import com.vaadin.ui.VerticalLayout
+import com.sirolf2009.thewarofwords.website.TheWarOfWordsUI
 
 class TopicCard extends VerticalLayout {
 	
-	new(String topicName, Resource image) {
+	new(String hash, String topicName, Resource image) {
+		width = "224px"
+		
 		val img = new Image()
 		img.source = image
 		img.addStyleName("card-preview-image")
@@ -34,6 +37,10 @@ class TopicCard extends VerticalLayout {
 		
 		margin = false
 		spacing = false
+		
+		addLayoutClickListener[
+			TheWarOfWordsUI.navigator.navigateTo("topic/"+hash)
+		]
 	}
 	
 }

@@ -12,6 +12,8 @@ import org.junit.Test
 import static datomic.Connection.*
 import static datomic.Peer.*
 import static datomic.Util.*
+import java.util.HashSet
+import clojure.lang.PersistentVector
 
 class TestDatomic {
 	
@@ -38,13 +40,21 @@ class TestDatomic {
 		 println(conn.transact(Util.readAll(new StringReader(source))).get())
 		 println(conn.transact(Util.readAll(new StringReader(reference))).get())
 		 
+		 val getTopics =  '''
+		[:find ?h ?n ?t
+		 :where [?e topic/hash ?h]
+		        [?e topic/name ?n]
+		        [?e topic/tags ?t]]'''
+		 val topics = query(getTopics, conn.db) as HashSet<PersistentVector>
+		 println(topics.get(0))
+		 println(topics.get(0).get(0))
+		 println(query(getTopics, conn.db))
 		 val getSources = '''
 		 [:find ?e ?n ?t ?r
 		  :where [?e :topic/hash "a52c1f10db3732590af183e06745381933440f4751130ecbfc55d4ed5ce7a943"]
 		  		 [?e :topic/name ?n]
 		  		 [?e :topic/tags ?t]
-		  		 [?e :topic/refers ?r]] 
-		 '''
+		  		 [?e :topic/refers ?r]]'''
 		 println(query(getSources, conn.db))
 	}
 	

@@ -5,6 +5,24 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/xtend-gen/main"/>
+        <dependent-module archiveName="thewarofwords-node-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thewarofwords-node/thewarofwords-node">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="thewarofwords-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thewarofwords-common/thewarofwords-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="objectchain-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-common/objectchain-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="objectchain-node-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-node/objectchain-node">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="objectchain-network-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-network/objectchain-network">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="objectchain-tracker-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-tracker/objectchain-tracker">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="thewarofwords-website"/>
         <property name="java-output-path" value="/thewarofwords-website/target/classes"/>
         <property name="component.exclusion.patterns" value="WEB-INF/classes/VAADIN/widgetsets/WEB-INF/**"/>

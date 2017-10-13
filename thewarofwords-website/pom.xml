@@ -67,11 +67,17 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>com.sirolf2009</groupId>
 			<artifactId>thewarofwords-node</artifactId>
 			<version>${project.version}</version>
-		</dependency> -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>twitter-widgets</artifactId>
+			<version>0.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
