@@ -14781,5 +14781,48 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .thewarofwordstheme .banner {
-	background: no-repeat center url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg/900px-20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg") !important;
+	background: no-repeat url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg/900px-20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg");
+	background-size: cover;
+}
+
+.thewarofwordstheme .card-outer {
+	background: #FFF;
+	display: inline-block;
+	width: 224px;
+	border-radius: 3px;
+	height: 266px;
+	position: relative;
+	padding: 0;
+	margin: 0;
+}
+
+.thewarofwordstheme .card {
+	padding: 0;
+	margin: 0;
+}
+
+.thewarofwordstheme .card-outer .card {
+	height: 100%;
+	width: 100%;
+	border-radius: 3px;
+	box-shadow: 0 1px 4px 0 rgba(12, 12, 13, 0.1);
+}
+
+.thewarofwordstheme .card-preview {
+	background-color: #F9F9FA;
+	position: relative;
+	height: 200px;
+	border-radius: 3px 3px 0 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+.thewarofwordstheme .card-preview-image {
+	height: 100%;
+	width: 100%;
+}
+
+.thewarofwordstheme .card-text {
+	padding-top: 8px;
+	padding-bottom: 8px;
 }
