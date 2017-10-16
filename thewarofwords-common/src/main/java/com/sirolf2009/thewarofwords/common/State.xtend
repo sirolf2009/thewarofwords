@@ -2,24 +2,27 @@ package com.sirolf2009.thewarofwords.common
 
 import clojure.lang.PersistentVector
 import com.esotericsoftware.kryo.Kryo
+import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.objectchain.common.interfaces.IState
 import com.sirolf2009.objectchain.common.model.Block
 import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
 import datomic.Connection
 import datomic.Database
 import datomic.Peer
 import datomic.Util
 import java.io.StringReader
+import java.net.URL
 import java.util.HashSet
 import java.util.List
 import java.util.concurrent.atomic.AtomicReference
+import java.util.stream.Collectors
 import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
-import java.util.stream.Collectors
 
 @Data class State implements IState {
 
@@ -83,8 +86,23 @@ import java.util.stream.Collectors
 		]
 	}
 	
-	def getSource(String hash) {
-		
+	def getSources() {
+		val query = '''
+		[:find ?h ?s ?t ?c ?o
+		 :where [?e source/hash ?h]
+		        [?e source/source ?s]
+				[?e source/type ?t]
+		        [?e source/comment ?c]
+		        [?e source/owner ?o]]'''
+		val response = Peer.query(query, database) as HashSet<PersistentVector>
+		val responseById = response.groupBy[get(0) as String]
+		responseById.mapValues[
+			val source = new URL(get(0).get(1) as String)
+			val type = SourceType.valueOf(get(0).get(2) as String)
+			val comment = get(0).get(3) as String
+			val owner = CryptoHelper.publicKey((get(0).get(4) as String).toByteArray)
+			return owner -> new Source(type, source, comment)
+		]
 	}
 
 }
