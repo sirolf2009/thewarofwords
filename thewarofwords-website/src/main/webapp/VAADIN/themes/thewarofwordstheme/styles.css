@@ -14783,6 +14783,24 @@ div.v-layout.v-horizontal.v-widget {
 .thewarofwordstheme .banner {
 	background: no-repeat url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg/900px-20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg");
 	background-size: cover;
+	height: 244px;
+	width: 100%;
+	position: relative;
+}
+
+.thewarofwordstheme .banner-title {
+	font-size: xx-large;
+	font-weight: bold;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+}
+
+.thewarofwordstheme .banner-navigation {
+	position: absolute;
+	left: 0;
+	bottom: 0;
 }
 
 .thewarofwordstheme .card-outer {

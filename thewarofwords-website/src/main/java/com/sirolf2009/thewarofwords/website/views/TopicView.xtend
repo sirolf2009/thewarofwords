@@ -8,7 +8,8 @@ import com.vaadin.ui.Label
 class TopicView extends VerticalLayout implements View {
 	
 	new() {
-		
+		spacing = false
+		margin = false
 	}
 	
 	override enter(ViewChangeEvent event) {

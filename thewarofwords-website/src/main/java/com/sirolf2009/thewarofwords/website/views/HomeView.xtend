@@ -12,6 +12,10 @@ import com.sirolf2009.thewarofwords.common.State
 class HomeView extends VerticalLayout implements View {
 	
 	new() {
+		println("creating new home")
+		spacing = false
+		margin = false
+		
 		val body = new HorizontalLayout()
 		
 		val state = TheWarOfWordsUIServlet.node.blockchain.mainBranch.lastState as State

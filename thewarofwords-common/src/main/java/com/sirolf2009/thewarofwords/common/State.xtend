@@ -74,7 +74,9 @@ import java.util.stream.Collectors
 		 :where [?e topic/hash ?h]
 		        [?e topic/name ?n]
 		        [?e topic/tags ?t]]'''
+		log.info("executing query {}", query)
 		val response = Peer.query(query, database) as HashSet<PersistentVector>
+		log.info(response+"")
 		val responseById = response.groupBy[get(0) as String]
 		responseById.mapValues[
 			val name = get(0).get(1) as String

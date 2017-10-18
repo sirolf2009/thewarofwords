@@ -12,6 +12,7 @@ import com.vaadin.server.VaadinServlet
 import com.vaadin.ui.UI
 import java.net.InetSocketAddress
 import javax.servlet.annotation.WebServlet
+import com.sirolf2009.thewarofwords.website.views.CreateTopic
 
 @Theme("thewarofwordstheme")
 class TheWarOfWordsUI extends UI {
@@ -24,6 +25,7 @@ class TheWarOfWordsUI extends UI {
 		navigator = new Navigator(this, this)
 		navigator.addView("", HomeView)
 		navigator.addView("topic", TopicView)
+		navigator.addView("newtopic", CreateTopic)
 	}
 	
 	@WebServlet(urlPatterns="/*", name="TheWarOfWordsUIServlet", asyncSupported=true)
