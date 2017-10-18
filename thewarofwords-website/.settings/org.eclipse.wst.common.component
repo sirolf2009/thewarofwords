@@ -11,16 +11,13 @@
         <dependent-module archiveName="thewarofwords-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/thewarofwords-common/thewarofwords-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="objectchain-common-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-common/objectchain-common">
+        <dependent-module archiveName="objectchain-common-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-common/objectchain-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="objectchain-node-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-node/objectchain-node">
+        <dependent-module archiveName="objectchain-node-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-node/objectchain-node">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="objectchain-network-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-network/objectchain-network">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="objectchain-tracker-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-tracker/objectchain-tracker">
+        <dependent-module archiveName="objectchain-network-0.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/objectchain-network/objectchain-network">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="thewarofwords-website"/>

@@ -21,7 +21,7 @@ class TheWarOfWordsUI extends UI {
 
 	override init(VaadinRequest vaadinRequest) {
 		page.title = "The War of Words"
-
+		
 		navigator = new Navigator(this, this)
 		navigator.addView("", HomeView)
 		navigator.addView("topic", TopicView)
@@ -32,12 +32,16 @@ class TheWarOfWordsUI extends UI {
 	@VaadinServletConfiguration(ui=TheWarOfWordsUI, productionMode=false)
 	public static class TheWarOfWordsUIServlet extends VaadinServlet {
 		
+		public static val node = NodeContainer.node
+		
+	}
+	
+	static class NodeContainer {
 		public static val node = {
 			new TheWarOfWordsNode(#[new InetSocketAddress("localhost", 2012)], 4567, Keys.generateAssymetricPair()) => [
 				start()
 			]
 		}
-		
 	}
 
 }

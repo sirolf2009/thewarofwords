@@ -10,14 +10,16 @@
 	<modules>
 		<module>thewarofwords-common</module>
 		<module>thewarofwords-node</module>
-    <module>thewarofwords-restnode</module>
-    <module>thewarofwords-miner</module>
-    <module>thewarofwords-website</module>
-  </modules>
+		<module>thewarofwords-restnode</module>
+		<module>thewarofwords-miner</module>
+		<module>thewarofwords-website</module>
+		<module>thewarofwords-tests</module>
+	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<xtend.version>2.12.0</xtend.version>
+		<objectchain.version>0.0.2-SNAPSHOT</objectchain.version>
 	</properties>
 
 	<dependencies>

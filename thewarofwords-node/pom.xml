@@ -17,12 +17,12 @@
 		<dependency>
 			<groupId>com.sirolf2009</groupId>
 			<artifactId>objectchain-node</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${objectchain.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sirolf2009</groupId>
 			<artifactId>objectchain-tracker</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${objectchain.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>info.picocli</groupId>

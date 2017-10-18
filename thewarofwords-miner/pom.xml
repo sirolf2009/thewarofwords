@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.sirolf2009</groupId>
 			<artifactId>objectchain-miner</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${objectchain.version}</version>
 		</dependency>
 	</dependencies>
 </project>
