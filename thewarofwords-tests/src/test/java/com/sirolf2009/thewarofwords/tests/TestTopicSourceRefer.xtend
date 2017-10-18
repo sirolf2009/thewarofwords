@@ -1,6 +1,7 @@
 package com.sirolf2009.thewarofwords.tests
 
 import com.sirolf2009.thewarofwords.common.State
+import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
@@ -14,11 +15,10 @@ import org.junit.Before
 import org.junit.Test
 
 import static java.lang.Thread.sleep
-import static org.junit.Assert.*
+import static junit.framework.Assert.*
 
-import static extension com.sirolf2009.thewarofwords.tests.Util.*
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
-import com.sirolf2009.thewarofwords.common.model.Reference
+import static extension com.sirolf2009.thewarofwords.tests.Util.*
 
 class TestTopicSourceRefer {
 

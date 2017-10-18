@@ -1,14 +1,13 @@
 package com.sirolf2009.thewarofwords.website.views
 
-import com.vaadin.ui.VerticalLayout
 import com.vaadin.navigator.View
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent
 import com.vaadin.ui.Label
+import com.vaadin.ui.VerticalLayout
 
 class TopicView extends VerticalLayout implements View {
 	
 	new() {
-		
 	}
 	
 	override enter(ViewChangeEvent event) {

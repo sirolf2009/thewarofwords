@@ -78,5 +78,27 @@
   .card-text {
      padding-top: 8px;
      padding-bottom: 8px;
-   }
+  }
+ 
+  .topic-card-outer {
+  	cursor: pointer;
+  }
+  
+  .timeline {
+  	position: relative;
+  }
+ 
+  .timeline-line {
+  	width: 6px;
+	background-color: #5F9EA0;
+	margin-left: auto;
+	margin-right: auto;
+	height: 100%;
+  	position: absolute;
+  	margin-left: 50%;
+  }
+ 
+  .timeline-container {
+  }
+
 }
