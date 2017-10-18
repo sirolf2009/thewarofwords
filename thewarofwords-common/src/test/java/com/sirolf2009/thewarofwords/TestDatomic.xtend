@@ -50,11 +50,13 @@ class TestDatomic {
 		 println(topics.get(0).get(0))
 		 println(query(getTopics, conn.db))
 		 val getSources = '''
-		 [:find ?e ?n ?t ?r
+		 [:find ?e ?n ?t ?s
 		  :where [?e :topic/hash "a52c1f10db3732590af183e06745381933440f4751130ecbfc55d4ed5ce7a943"]
 		  		 [?e :topic/name ?n]
 		  		 [?e :topic/tags ?t]
-		  		 [?e :topic/refers ?r]]'''
+		  		 [?e :topic/refers ?r]
+		  		 [?source :source/hash ?r]
+		  		 [?source :source/source ?s]]'''
 		 println(query(getSources, conn.db))
 	}
 	

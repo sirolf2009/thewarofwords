@@ -17,6 +17,7 @@ import java.io.StringReader
 import java.net.URL
 import java.util.HashSet
 import java.util.List
+import java.util.Map
 import java.util.concurrent.atomic.AtomicReference
 import java.util.stream.Collectors
 import org.eclipse.xtend.lib.annotations.Data
@@ -59,16 +60,22 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		].toList()
 		//TODO prepared statements
 		
-		val query = (topics+sources+references).join("[", "\n", "]", [toString()])
+		execute(topics + sources)
+		val lastTx = execute(references)
+
+		return new State(connection, lastTx.get(Connection.DB_AFTER) as Database)
+	}
+	
+	def private execute(Iterable<String> queries) {
+		val query = queries.join("[", "\n", "]", [toString()])
 		log.info("executing query {}", query)
 		val reader = new StringReader(query)
 		val lastTx = new AtomicReference()
 		val List<List<?>> statements = Util.readAll(reader)
 		statements.forEach[
-			lastTx.set(connection.transact(it).get())
+			lastTx.set(connection.transact(it).get() as Map<?, ?>)
 		]
-
-		return new State(connection, lastTx.get().get(Connection.DB_AFTER) as Database)
+		return lastTx.get()
 	}
 	
 	def getTopics() {
@@ -87,14 +94,40 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	}
 	
 	def getSources() {
-		val query = '''
+		query('''
 		[:find ?h ?s ?t ?c ?o
 		 :where [?e source/hash ?h]
 		        [?e source/source ?s]
 				[?e source/type ?t]
 		        [?e source/comment ?c]
-		        [?e source/owner ?o]]'''
-		val response = Peer.query(query, database) as HashSet<PersistentVector>
+		        [?e source/owner ?o]]''').parseSources()
+	}
+	
+	def getSource(String sourceHash) {
+		query('''
+		[:find ?h ?s ?t ?c ?o
+		 :where [?e source/hash "«sourceHash»"]
+		 		[?e source/hash ?h]
+		        [?e source/source ?s]
+				[?e source/type ?t]
+		        [?e source/comment ?c]
+		        [?e source/owner ?o]]''').parseSources()
+	}
+	
+	def getSources(String topicHash) {
+		query('''
+		[:find ?h ?s ?t ?c ?o
+		 :where [?topic topic/hash "«topicHash»"]
+		        [?topic topic/refers ?reference]
+		        [?source source/hash ?reference]
+		        [?source source/hash ?h]
+		        [?source source/source ?s]
+		        [?source source/type ?t]
+		        [?source source/comment ?c]
+		        [?source source/owner ?o]]''').parseSources()
+	}
+	
+	def private parseSources(HashSet<PersistentVector> response) {
 		val responseById = response.groupBy[get(0) as String]
 		responseById.mapValues[
 			val source = new URL(get(0).get(1) as String)
@@ -103,6 +136,10 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			val owner = CryptoHelper.publicKey((get(0).get(4) as String).toByteArray)
 			return owner -> new Source(type, source, comment)
 		]
+	}
+	
+	def private query(String query) {
+		return Peer.query(query, database) as HashSet<PersistentVector>
 	}
 
 }
