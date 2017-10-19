@@ -19,7 +19,6 @@ import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.concurrent.atomic.AtomicReference
-import java.util.stream.Collectors
 import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
@@ -60,15 +59,15 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		].toList()
 		//TODO prepared statements
 		
-		execute(topics + sources)
-		val lastTx = execute(references)
+		log.debug("new topics and sources: {}", execute(topics + sources))
+		log.debug("new references: {}", execute(references))
 
-		return new State(connection, lastTx.get(Connection.DB_AFTER) as Database)
+		return new State(connection, connection.db)
 	}
 	
 	def private execute(Iterable<String> queries) {
 		val query = queries.join("[", "\n", "]", [toString()])
-		log.info("executing query {}", query)
+		log.debug("executing query {}", query)
 		val reader = new StringReader(query)
 		val lastTx = new AtomicReference()
 		val List<List<?>> statements = Util.readAll(reader)
@@ -80,19 +79,13 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	
 	def getTopics() {
 		val query = '''
-		[:find ?h ?n ?t
-		 :where [?e topic/hash ?h]
-		        [?e topic/name ?n]
-		        [?e topic/tags ?t]]'''
-		log.info("executing query {}", query)
-		val response = Peer.query(query, database) as HashSet<PersistentVector>
-		log.info(response+"")
-		val responseById = response.groupBy[get(0) as String]
-		responseById.mapValues[
-			val name = get(0).get(1) as String
-			val tags = map[get(2) as String].stream.distinct.collect(Collectors.toList())
-			return new Topic(name, tags)
-		]
+		[:find [?e ...]
+		 :where [?e topic/hash _]]'''
+		log.debug("executing query {}", query)
+		val response = Peer.query(query, database) as PersistentVector
+		response.map[database.entity(it)].map[
+			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/tags") as List<String>)
+		].toMap([key], [value])
 	}
 	
 	def getSources() {

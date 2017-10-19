@@ -58,6 +58,21 @@ class TestDatomic {
 		  		 [?source :source/hash ?r]
 		  		 [?source :source/source ?s]]'''
 		 println(query(getSources, conn.db))
+		 
+		val topicNoTags = '''
+		{:topic/hash "asd"
+		 :topic/name "Awesome Things Without tags"}'''
+		 println(conn.transact(Util.readAll(new StringReader(topicNoTags))).get())
+		 
+		 val getTopicIDs =  '''
+		[:find [?e ...]
+		 :where [?e topic/hash _]]'''
+		 val response = query(getTopicIDs, conn.db) as PersistentVector
+		 response.map[
+		 	conn.db.entity(it).get(":topic/tags")
+		 ].forEach[
+		 	println(it)
+		 ]
 	}
 	
 	@Test

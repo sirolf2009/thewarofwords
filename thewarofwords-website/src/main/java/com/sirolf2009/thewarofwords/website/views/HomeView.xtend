@@ -16,7 +16,6 @@ import java.net.URL
 class HomeView extends VerticalLayout implements View {
 	
 	new() {
-		println("creating new home")
 		spacing = false
 		margin = false
 		
