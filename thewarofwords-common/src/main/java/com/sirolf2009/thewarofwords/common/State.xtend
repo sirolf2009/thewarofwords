@@ -31,6 +31,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	val Database database
 
 	override apply(Kryo kryo, Block block) {
+		log.debug("Applying block {}", block.toString(kryo))
 		val topics = block.mutations.filter[object instanceof Topic].map[mutation|
 			val it = mutation.object as Topic
 			'''
@@ -134,6 +135,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	}
 	
 	def private query(String query) {
+		log.debug("Executing query {}", query)
 		return Peer.query(query, database) as HashSet<PersistentVector>
 	}
 

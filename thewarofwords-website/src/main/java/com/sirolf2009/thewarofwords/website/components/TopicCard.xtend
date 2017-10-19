@@ -9,8 +9,6 @@ import com.sirolf2009.thewarofwords.website.TheWarOfWordsUI
 class TopicCard extends VerticalLayout {
 	
 	new(String hash, String topicName, Resource image) {
-		width = "224px"
-		
 		val img = new Image()
 		img.source = image
 		img.addStyleName("card-preview-image")

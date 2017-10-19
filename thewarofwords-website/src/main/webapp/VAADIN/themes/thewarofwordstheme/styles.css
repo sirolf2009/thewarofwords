@@ -14807,7 +14807,6 @@ div.v-layout.v-horizontal.v-widget {
 	background: #FFF;
 	display: inline-block;
 	border-radius: 3px;
-	height: 266px;
 	position: relative;
 	padding: 0;
 	margin: 0;
@@ -14826,7 +14825,6 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .thewarofwordstheme .card-preview {
-	background-color: #F9F9FA;
 	position: relative;
 	height: 200px;
 	border-radius: 3px 3px 0 0;
@@ -14846,6 +14844,25 @@ div.v-layout.v-horizontal.v-widget {
 
 .thewarofwordstheme .topic-card-outer {
 	cursor: pointer;
+	width: 224px;
+	height: 266px;
+}
+
+.thewarofwordstheme .source-card-outer {
+	width: 448px;
+	height: 200px;
+}
+
+.thewarofwordstheme .source-card {
+	width: 448px;
+	height: 200px;
+}
+
+.thewarofwordstheme .signature {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 18px;
 }
 
 .thewarofwordstheme .timeline {

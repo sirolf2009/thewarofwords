@@ -2,6 +2,7 @@ package com.sirolf2009.thewarofwords.website.views
 
 import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.website.TheWarOfWordsUI.TheWarOfWordsUIServlet
 import com.sirolf2009.thewarofwords.website.components.Banner
 import com.sirolf2009.thewarofwords.website.components.Timeline
@@ -10,7 +11,6 @@ import com.vaadin.navigator.View
 import com.vaadin.server.ExternalResource
 import com.vaadin.ui.HorizontalLayout
 import com.vaadin.ui.VerticalLayout
-import com.sirolf2009.thewarofwords.common.model.SourceType
 import java.net.URL
 
 class HomeView extends VerticalLayout implements View {
