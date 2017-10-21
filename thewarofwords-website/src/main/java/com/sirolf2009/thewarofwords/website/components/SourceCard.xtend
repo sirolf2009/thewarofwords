@@ -16,7 +16,10 @@ class SourceCard extends HorizontalLayout {
 
 	new(String hash, PublicKey publicKey, String comment, URL url) {
 		val img = new Image()
-		img.source = new ExternalResource(url.favicon)
+		try {
+			img.source = new ExternalResource(url.favicon)
+		} catch(Exception e) {
+		}
 		img.addStyleName("card-preview-image")
 		val imgContainer = new VerticalLayout()
 		imgContainer.addStyleNames("card-preview", "source-card-preview")

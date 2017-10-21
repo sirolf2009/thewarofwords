@@ -33,6 +33,12 @@
 
 @mixin thewarofwordstheme {
   @include valo;
+  	
+  .topic-card-outer {
+  	cursor: pointer;
+  	width: 224px;
+    height: 266px;
+  }
 
   .banner {
     background: no-repeat url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg/900px-20101024_Panoramic_Image_of_Athens_from_Areopagus_hill_Greece.jpg");
@@ -56,6 +62,10 @@
     left: 0;
     bottom: 0;
   }
+ 
+  .source-card-outer {
+    max-width: 800px;
+  }
   
   .card-outer {
     background: #FFF;
@@ -69,14 +79,9 @@
   .card {
      padding: 0;
      margin: 0;
+     border-radius: 3px;
+     box-shadow: 0 1px 4px 0 rgba(12, 12, 13, 0.1);
    }
- 
-  .card-outer .card {
-    height: 100%;
-    width: 100%;
-    border-radius: 3px;
-    box-shadow: 0 1px 4px 0 rgba(12, 12, 13, 0.1);
-  }
  
   .card-preview {
     position: relative;
@@ -96,27 +101,20 @@
      padding-bottom: 8px;
   }
  
-  .topic-card-outer {
-  	cursor: pointer;
-  	width: 224px;
-    height: 266px;
-  }
- 
-  .source-card-outer {
-  	width: 448px;
-    height: 200px;
-  }
- 
-  .source-card {
-  	width: 448px;
-    height: 200px;
+ .card-title {
+ 	overflow-wrap: break-word;
+	white-space: initial;
   }
  
   .signature {
   	position: absolute;
     bottom: 0;
-    right: 0;
-    padding: 18px;
+    left: 0;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    width: 100%;
+    font-size: small;
+    color: #878787;
   }
   
   .timeline {
@@ -134,6 +132,11 @@
   }
  
   .timeline-container {
+  }
+
+  .v-panel-content {
+  	padding-left: 8px;
+  	padding-right: 8px;
   }
 
 }
