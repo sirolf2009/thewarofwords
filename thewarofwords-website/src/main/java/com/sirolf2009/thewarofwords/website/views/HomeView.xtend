@@ -28,15 +28,6 @@ class HomeView extends VerticalLayout implements View {
 			body.addComponent(new TopicCard(hash, topic.name, new ExternalResource("https://avatars3.githubusercontent.com/u/3534736?s=460&v=4")))
 		]
 		
-		body.addComponents(new Timeline(#[
-			new Source(SourceType.ARTICLE, new URL("http://www.google.com"), "google"),
-			new Source(SourceType.ARTICLE, new URL("http://www.youtube.com"), "youtube"),
-			new Source(SourceType.ARTICLE, new URL("http://www.asd.com"), "asd"),
-			new Source(SourceType.ARTICLE, new URL("http://www.qwerty.com"), "qwerty"),
-			new Source(SourceType.ARTICLE, new URL("http://www.potpol.com"), "potpol"),
-			new Source(SourceType.ARTICLE, new URL("http://www.aristotle.com"), "aristotle")
-		]))
-		
 		addComponents(new Banner(), body)
 	}
 	
