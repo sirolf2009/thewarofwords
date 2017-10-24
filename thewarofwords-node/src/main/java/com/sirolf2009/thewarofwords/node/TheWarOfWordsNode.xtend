@@ -11,10 +11,12 @@ import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
+import com.sirolf2009.thewarofwords.common.model.Upvote
 import com.sirolf2009.thewarofwords.common.serializer.SerializerReference
 import com.sirolf2009.thewarofwords.common.serializer.SerializerSource
 import com.sirolf2009.thewarofwords.common.serializer.SerializerSourceType
 import com.sirolf2009.thewarofwords.common.serializer.SerializerTopic
+import com.sirolf2009.thewarofwords.common.serializer.SerializerUpvote
 import datomic.Peer
 import java.io.File
 import java.net.InetSocketAddress
@@ -22,6 +24,8 @@ import java.security.KeyPair
 import java.util.List
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
+
+import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 class TheWarOfWordsNode extends Node {
 
@@ -32,6 +36,7 @@ class TheWarOfWordsNode extends Node {
 	}
 	
 	override isValid(Mutation mutation) {
+		val state = blockchain.mainBranch.lastState as State
 		if(mutation.object instanceof Source) {
 			try {
 				(mutation.object as Source).verify()
@@ -40,7 +45,15 @@ class TheWarOfWordsNode extends Node {
 				log.error("Failed to verify source mutation", e)
 				return false
 			}
+		} else if(mutation.object instanceof Upvote) {
+			try {
+				return !state.getSource((mutation.object as Upvote).sourceHash.toHexString()).isEmpty()
+			} catch(Exception e) {
+				log.error("Failed to verify upvote mutation", e)
+				return false
+			}
 		}
+		return true
 	}
 
 	def static configuration() {
@@ -57,6 +70,7 @@ class TheWarOfWordsNode extends Node {
 		kryo.register(Source, new SerializerSource())
 		kryo.register(Topic, new SerializerTopic())
 		kryo.register(Reference, new SerializerReference())
+		kryo.register(Upvote, new SerializerUpvote())
 		return kryo
 	}
 

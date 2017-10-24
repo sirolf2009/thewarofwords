@@ -23,6 +23,8 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+import com.sirolf2009.thewarofwords.common.model.Upvote
+import java.security.PublicKey
 
 @Data class State implements IState {
 
@@ -32,84 +34,93 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 	override apply(Kryo kryo, Block block) {
 		log.debug("Applying block {}", block.toString(kryo))
-		val topics = block.mutations.filter[object instanceof Topic].map[mutation|
+		val topics = block.mutations.filter[object instanceof Topic].map [ mutation |
 			val it = mutation.object as Topic
 			'''
-				{:topic/hash "«mutation.hash(kryo).toHexString()»"
-				 :topic/name "«name»"
-				 «IF !tags.empty»
-				 :topic/tags [«tags.map['''"«it»"'''].join(" ")»]
-				 «ENDIF»
-				 }'''
+			{:topic/hash "«mutation.hash(kryo).toHexString()»"
+			 :topic/name "«name»"
+			 «IF !tags.empty»
+			 	:topic/tags [«tags.map['''"«it»"'''].join(" ")»]
+			 «ENDIF»
+			 }'''
 		].toList()
-		val sources = block.mutations.filter[object instanceof Source].map[mutation|
+		val sources = block.mutations.filter[object instanceof Source].map [ mutation |
 			val it = mutation.object as Source
 			'''
-				{:source/hash "«mutation.hash(kryo).toHexString()»"
-				 :source/source "«source»"
-				 :source/type "«sourceType»"
-				 :source/comment "«comment»"
-				 :source/owner "«mutation.publicKey.encoded.toHexString()»"}'''
+			{:source/hash "«mutation.hash(kryo).toHexString()»"
+			 :source/source "«source»"
+			 :source/type "«sourceType»"
+			 :source/comment "«comment»"
+			 :source/owner "«mutation.publicKey.encoded.toHexString()»"}'''
 		].toList()
 
-		val references = block.mutations.filter[object instanceof Reference].map[mutation|
+		val references = block.mutations.filter[object instanceof Reference].map [ mutation |
 			val it = mutation.object as Reference
 			'''
-			 {:db/id [:topic/hash "«topic.toHexString()»"]
-			  :topic/refers "«source.toHexString()»"}'''
+			{:db/id [:topic/hash "«topic.toHexString()»"]
+			 :topic/refers "«source.toHexString()»"}'''
 		].toList()
-		//TODO prepared statements
-		
+		val upvotes = block.mutations.filter[object instanceof Upvote].map [ mutation |
+			val it = mutation.object as Upvote
+			'''
+			{:upvote/hash "«mutation.hash(kryo).toHexString()»"
+			 :upvote/voter "«voter.encoded.toHexString()»"
+			 :upvote/source "«sourceHash.toHexString()»"
+			 :upvote/topic "«topicHash.toHexString()»"}'''
+		].toList()
+		// TODO prepared statements
 		log.debug("new topics and sources: {}", execute(topics + sources))
-		log.debug("new references: {}", execute(references))
+		log.debug("new references and upvotes: {}", execute(references + upvotes))
 
 		return new State(connection, connection.db)
 	}
-	
+
 	def private execute(Iterable<String> queries) {
 		val query = queries.join("[", "\n", "]", [toString()])
 		log.debug("executing query {}", query)
 		val reader = new StringReader(query)
 		val lastTx = new AtomicReference()
 		val List<List<?>> statements = Util.readAll(reader)
-		statements.forEach[
-			lastTx.set(connection.transact(it).get() as Map<?, ?>)
+		statements.forEach [
+			try {
+				lastTx.set(connection.transact(it).get() as Map<?, ?>)
+			} catch(Exception e) {
+				log.error("Failed to execute query {}", it, e)
+			}
 		]
 		return lastTx.get()
 	}
-	
+
 	def getTopics() {
-		val query = '''
+		val response = queryVector('''
 		[:find [?e ...]
-		 :where [?e topic/hash _]]'''
-		log.debug("executing query {}", query)
-		val response = Peer.query(query, database) as PersistentVector
-		response.map[database.entity(it)].map[
+		 :where [?e topic/hash _]]''')
+		response.map[database.entity(it)].map [
 			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/tags") as List<String>)
 		].toMap([key], [value])
 	}
-	
+
 	def getSources() {
 		query('''
 		[:find ?h ?s ?t ?c ?o
 		 :where [?e source/hash ?h]
 		        [?e source/source ?s]
-				[?e source/type ?t]
-		        [?e source/comment ?c]
-		        [?e source/owner ?o]]''').parseSources()
+		 	[?e source/type ?t]
+		 	      [?e source/comment ?c]
+		 	      [?e source/owner ?o]]''').parseSources()
 	}
-	
+
 	def getSource(String sourceHash) {
 		query('''
 		[:find ?h ?s ?t ?c ?o
 		 :where [?e source/hash "«sourceHash»"]
 		 		[?e source/hash ?h]
-		        [?e source/source ?s]
-				[?e source/type ?t]
-		        [?e source/comment ?c]
-		        [?e source/owner ?o]]''').parseSources()
+		 		     [?e source/source ?s]
+		 	[?e source/type ?t]
+		 	      [?e source/comment ?c]
+		 	      [?e source/owner ?o]]''').parseSources()
 	}
-	
+
 	def getSources(String topicHash) {
 		query('''
 		[:find ?h ?s ?t ?c ?o
@@ -122,10 +133,10 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		        [?source source/comment ?c]
 		        [?source source/owner ?o]]''').parseSources()
 	}
-	
+
 	def private parseSources(HashSet<PersistentVector> response) {
 		val responseById = response.groupBy[get(0) as String]
-		responseById.mapValues[
+		responseById.mapValues [
 			val source = new URL(get(0).get(1) as String)
 			val type = SourceType.valueOf(get(0).get(2) as String)
 			val comment = get(0).get(3) as String
@@ -133,10 +144,23 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			return owner -> new Source(type, source, comment)
 		]
 	}
-	
+
+	def getUpvotes(PublicKey key) {
+		queryVector('''
+		[:find [?upvote ...]
+		 :where [?source source/owner "«key.encoded.toHexString()»"]
+		 		[?source source/hash ?source-hash]
+		 		[?upvote upvote/source ?source-hash]]''')
+	}
+
 	def private query(String query) {
 		log.debug("Executing query {}", query)
 		return Peer.query(query, database) as HashSet<PersistentVector>
+	}
+
+	def private queryVector(String query) {
+		log.debug("Executing query {}", query)
+		return Peer.query(query, database) as PersistentVector
 	}
 
 }
