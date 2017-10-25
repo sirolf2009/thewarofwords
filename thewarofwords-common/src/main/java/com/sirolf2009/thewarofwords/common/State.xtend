@@ -25,16 +25,20 @@ import org.slf4j.LoggerFactory
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 import com.sirolf2009.thewarofwords.common.model.Upvote
 import java.security.PublicKey
+import java.util.Set
 
 @Data class State implements IState {
 
 	static val log = LoggerFactory.getLogger(State)
 	val Connection connection
 	val Database database
+	val int blockNumber
 
 	override apply(Kryo kryo, Block block) {
 		log.debug("Applying block {}", block.toString(kryo))
-		val topics = block.mutations.filter[object instanceof Topic].map [ mutation |
+
+		val topics = block.mutations.filter[object instanceof Topic].toList()
+		val topicsQuery = topics.map [ mutation |
 			val it = mutation.object as Topic
 			'''
 			{:topic/hash "«mutation.hash(kryo).toHexString()»"
@@ -44,7 +48,9 @@ import java.security.PublicKey
 			 «ENDIF»
 			 }'''
 		].toList()
-		val sources = block.mutations.filter[object instanceof Source].map [ mutation |
+
+		val sources = block.mutations.filter[object instanceof Source].toList()
+		val sourcesQuery = sources.map [ mutation |
 			val it = mutation.object as Source
 			'''
 			{:source/hash "«mutation.hash(kryo).toHexString()»"
@@ -54,13 +60,16 @@ import java.security.PublicKey
 			 :source/owner "«mutation.publicKey.encoded.toHexString()»"}'''
 		].toList()
 
-		val references = block.mutations.filter[object instanceof Reference].map [ mutation |
+		val references = block.mutations.filter[object instanceof Reference].toList()
+		val referencesQuery = references.map [ mutation |
 			val it = mutation.object as Reference
 			'''
 			{:db/id [:topic/hash "«topic.toHexString()»"]
 			 :topic/refers "«source.toHexString()»"}'''
 		].toList()
-		val upvotes = block.mutations.filter[object instanceof Upvote].map [ mutation |
+
+		val upvotes = block.mutations.filter[object instanceof Upvote].toList()
+		val upvotesQuery = upvotes.map [ mutation |
 			val it = mutation.object as Upvote
 			'''
 			{:upvote/hash "«mutation.hash(kryo).toHexString()»"
@@ -68,11 +77,20 @@ import java.security.PublicKey
 			 :upvote/source "«sourceHash.toHexString()»"
 			 :upvote/topic "«topicHash.toHexString()»"}'''
 		].toList()
-		// TODO prepared statements
-		log.debug("new topics and sources: {}", execute(topics + sources))
-		log.debug("new references and upvotes: {}", execute(references + upvotes))
 
-		return new State(connection, connection.db)
+		val blockQuery = '''
+			{:block/hash "«block.hash(kryo).toHexString()»"
+			 :block/number «blockNumber»
+			 «topics.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-topics [", " ", "]", [toString()])»
+			 «sources.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-sources [", " ", "]", [toString()])»
+			 «references.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-references [", " ", "]", [toString()])»}
+		'''
+		// TODO prepared statements
+		log.debug("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
+		log.debug("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
+		log.debug("new block: {}", execute(#[blockQuery]))
+
+		return new State(connection, connection.db, blockNumber + 1)
 	}
 
 	def private execute(Iterable<String> queries) {
@@ -82,11 +100,7 @@ import java.security.PublicKey
 		val lastTx = new AtomicReference()
 		val List<List<?>> statements = Util.readAll(reader)
 		statements.forEach [
-			try {
-				lastTx.set(connection.transact(it).get() as Map<?, ?>)
-			} catch(Exception e) {
-				log.error("Failed to execute query {}", it, e)
-			}
+			lastTx.set(connection.transact(it).get() as Map<?, ?>)
 		]
 		return lastTx.get()
 	}
@@ -96,8 +110,24 @@ import java.security.PublicKey
 		[:find [?e ...]
 		 :where [?e topic/hash _]]''')
 		response.map[database.entity(it)].map [
-			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/tags") as List<String>)
+			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, (get(":topic/tags") as Set<String>).toList())
 		].toMap([key], [value])
+	}
+
+	def getBlocknumberForTopic(String topicHash) {
+		queryVector('''
+		[:find [?b ...]
+		 :where [?block block/added-topics "«topicHash»"]
+		 		[?block block/number ?b]]
+		''').get(0)
+	}
+
+	def getBlocknumberForSource(String sourceHash) {
+		queryVector('''
+		[:find [?b ...]
+		 :where [?block block/added-sources "«sourceHash»"]
+		 		[?block block/number ?b]]
+		''').get(0)
 	}
 
 	def getSources() {

@@ -1,22 +1,13 @@
 package com.sirolf2009.thewarofwords.node
 
-import com.esotericsoftware.kryo.Kryo
 import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Configuration
 import com.sirolf2009.objectchain.common.model.Mutation
 import com.sirolf2009.objectchain.node.Node
 import com.sirolf2009.thewarofwords.common.Schema
 import com.sirolf2009.thewarofwords.common.State
-import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
-import com.sirolf2009.thewarofwords.common.model.SourceType
-import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.common.model.Upvote
-import com.sirolf2009.thewarofwords.common.serializer.SerializerReference
-import com.sirolf2009.thewarofwords.common.serializer.SerializerSource
-import com.sirolf2009.thewarofwords.common.serializer.SerializerSourceType
-import com.sirolf2009.thewarofwords.common.serializer.SerializerTopic
-import com.sirolf2009.thewarofwords.common.serializer.SerializerUpvote
 import datomic.Peer
 import java.io.File
 import java.net.InetSocketAddress
@@ -24,6 +15,8 @@ import java.security.KeyPair
 import java.util.List
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
+
+import static com.sirolf2009.thewarofwords.common.TheWarOfWordsKryo.*
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
@@ -61,17 +54,7 @@ class TheWarOfWordsNode extends Node {
 		Peer.createDatabase(uri)
 		val conn = Peer.connect(uri)
 		Schema.addSchema(conn)
-		return new Configuration.Builder().setGenesisState(new State(conn, conn.db)).build()
-	}
-
-	def static kryo() {
-		val kryo = new Kryo()
-		kryo.register(SourceType, new SerializerSourceType())
-		kryo.register(Source, new SerializerSource())
-		kryo.register(Topic, new SerializerTopic())
-		kryo.register(Reference, new SerializerReference())
-		kryo.register(Upvote, new SerializerUpvote())
-		return kryo
+		return new Configuration.Builder().setGenesisState(new State(conn, conn.db, 0)).build()
 	}
 
 	def static void main(String[] args) {
