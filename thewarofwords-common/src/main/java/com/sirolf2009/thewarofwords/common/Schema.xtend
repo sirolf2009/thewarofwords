@@ -13,11 +13,31 @@ class Schema {
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db/unique :db.unique/identity}
-  
+    
  {:db/ident :block/number
   :db/valueType :db.type/long
   :db/cardinality :db.cardinality/one}
+      
+ {:db/ident :block/previous-block
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one}
+
+ {:db/ident :block/merkleroot
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one}
   
+ {:db/ident :block/time
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one}
+  
+ {:db/ident :block/target
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one}  
+  
+ {:db/ident :block/nonce
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one}
+    
  {:db/ident :block/added-sources
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/many}

@@ -5,27 +5,31 @@ import com.esotericsoftware.kryo.Kryo
 import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.objectchain.common.interfaces.IState
 import com.sirolf2009.objectchain.common.model.Block
+import com.sirolf2009.objectchain.common.model.BlockHeader
 import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
+import com.sirolf2009.thewarofwords.common.model.Upvote
 import datomic.Connection
 import datomic.Database
 import datomic.Peer
 import datomic.Util
 import java.io.StringReader
+import java.math.BigInteger
 import java.net.URL
+import java.security.PublicKey
+import java.util.Date
 import java.util.HashSet
 import java.util.List
 import java.util.Map
+import java.util.Set
 import java.util.concurrent.atomic.AtomicReference
 import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
-import com.sirolf2009.thewarofwords.common.model.Upvote
-import java.security.PublicKey
-import java.util.Set
+import java.util.TreeSet
 
 @Data class State implements IState {
 
@@ -81,6 +85,11 @@ import java.util.Set
 		val blockQuery = '''
 			{:block/hash "«block.hash(kryo).toHexString()»"
 			 :block/number «blockNumber»
+			 :block/previous-block "«block.header.previousBlock.toHexString()»"
+			 :block/merkleroot "«block.header.merkleRoot.toHexString()»"
+			 :block/time «block.header.time.time»
+			 :block/target "«block.header.target.toByteArray().toHexString()»"
+			 :block/nonce «block.header.nonce»
 			 «topics.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-topics [", " ", "]", [toString()])»
 			 «sources.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-sources [", " ", "]", [toString()])»
 			 «references.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-references [", " ", "]", [toString()])»}
@@ -181,6 +190,35 @@ import java.util.Set
 		 :where [?source source/owner "«key.encoded.toHexString()»"]
 		 		[?source source/hash ?source-hash]
 		 		[?upvote upvote/source ?source-hash]]''')
+	}
+	
+	def parseBlock(Object blockID) {
+		val entity = database.entity(blockID)
+		val previousBlock = entity.get(":block/previous-block") as String
+		val merkleroot = entity.get(":block/merkleroot") as String
+		val time = entity.get(":block/time") as Long
+		val target = entity.get(":block/target") as String
+		val nonce = entity.get(":block/nonce") as Long
+		val sources = entity.get(":block/added-sources") as Set<String>
+		val topics = entity.get(":block/added-topics") as Set<String>
+		
+		val header = new BlockHeader(previousBlock.toByteArray(), merkleroot.toByteArray(), new Date(time), new BigInteger(target.toByteArray()), nonce.intValue())
+		return new Block(header, new TreeSet(#[sources.map[parseSource], topics.map[parseTopic]]))
+	}
+	
+	def parseTopic(Object blockID) {
+		val entity = database.entity(blockID)
+		val name = entity.get(":topic/name") as String
+		val tags = entity.get(":topic/tags") as Set<String>
+		return new Topic(name, tags.toList())
+	}
+	
+	def parseSource(Object blockID) {
+		val entity = database.entity(blockID)
+		val source = entity.get(":source/source") as String
+		val comment = entity.get(":source/comment") as String
+		val type = entity.get(":source/type") as String
+		return new Source(SourceType.valueOf(type), new URL(source), comment)
 	}
 
 	def private query(String query) {
