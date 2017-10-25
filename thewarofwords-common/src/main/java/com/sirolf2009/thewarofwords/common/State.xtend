@@ -95,15 +95,18 @@ import java.util.TreeSet
 			 «references.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-references [", " ", "]", [toString()])»}
 		'''
 		// TODO prepared statements
-		log.debug("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
-		log.debug("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
-		log.debug("new block: {}", execute(#[blockQuery]))
+		log.trace("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
+		log.trace("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
+		log.trace("new block: {}", execute(#[blockQuery]))
 
 		return new State(connection, connection.db, blockNumber + 1)
 	}
 
 	def private execute(Iterable<String> queries) {
 		val query = queries.join("[", "\n", "]", [toString()])
+		if(query.empty) {
+			return null
+		}
 		log.debug("executing query {}", query)
 		val reader = new StringReader(query)
 		val lastTx = new AtomicReference()
