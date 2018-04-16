@@ -23,8 +23,9 @@ class MainController {
 	
 	@FXML
 	def void initialize() {
-		node = new UINode(#[new InetSocketAddress("localhost", 2012)], 4567, getKeys())
+		node = new UINode(#[new InetSocketAddress("thewarofwords.com", 2012)], 4567, getKeys())
 		facade = new TheWarOfWordsFacade(node)
+		new Thread[node.start()].start()
 		
 		lblIsConnected.textProperty().bind(node.getIsConnected().asString())
 		lblLastBlock.textProperty().bind(node.getLastBlock())
@@ -46,5 +47,5 @@ class MainController {
 		}
 		return new KeyPair(Keys.readPublicKeyFromFile(publicKey), Keys.readPrivateKeyFromFile(privateKey))
 	}
-	
+
 }

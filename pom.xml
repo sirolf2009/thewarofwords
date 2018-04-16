@@ -4,7 +4,7 @@
 	<groupId>com.sirolf2009</groupId>
 	<artifactId>thewarofwords</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>xtend-quickstart</name>
+	<name>thewarofwords</name>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -12,9 +12,8 @@
 		<module>thewarofwords-node</module>
 		<module>thewarofwords-restnode</module>
 		<module>thewarofwords-miner</module>
-		<module>thewarofwords-website</module>
 		<module>thewarofwords-tests</module>
-    <module>thewarofwords-ui</module>
+    	<module>thewarofwords-ui</module>
   </modules>
 
 	<properties>
