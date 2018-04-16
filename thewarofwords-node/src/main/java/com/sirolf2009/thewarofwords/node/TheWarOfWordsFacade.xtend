@@ -7,6 +7,9 @@ import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Source
 import java.net.URL
 import com.sirolf2009.thewarofwords.common.State
+import com.sirolf2009.thewarofwords.common.model.Reference
+import com.sirolf2009.thewarofwords.common.model.Upvote
+import java.util.List
 
 class TheWarOfWordsFacade {
 	
@@ -46,6 +49,14 @@ class TheWarOfWordsFacade {
 	
 	def postSource(Source source) {
 		node.submitMutation(source)
+	}
+	
+	def upvote(Reference reference) {
+		upvote(reference.source, reference.topic)
+	}
+
+	def upvote(List<Byte> sourceHash, List<Byte> topicHash) {
+		node.submitMutation(new Upvote(node.keys.public, sourceHash, topicHash))
 	}
 	
 	def private getState() {
