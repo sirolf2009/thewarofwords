@@ -1,0 +1,13 @@
+.main-tab *.tab-label {
+    -fx-rotate: 90;
+}
+.main-tab *.tab {
+    -fx-padding: 4em 1em 4em 1em;
+}
+.main-tab:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+  -fx-border-color: transparent;
+}
+
+.network-grid {
+	-fx-padding: 16px;
+}

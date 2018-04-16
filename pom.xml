@@ -14,7 +14,8 @@
 		<module>thewarofwords-miner</module>
 		<module>thewarofwords-website</module>
 		<module>thewarofwords-tests</module>
-	</modules>
+    <module>thewarofwords-ui</module>
+  </modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
