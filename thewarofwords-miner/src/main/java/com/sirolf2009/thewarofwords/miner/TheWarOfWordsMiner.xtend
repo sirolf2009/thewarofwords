@@ -10,13 +10,14 @@ import java.security.KeyPair
 import java.util.List
 import org.slf4j.LoggerFactory
 import picocli.CommandLine
+import com.sirolf2009.thewarofwords.common.TheWarOfWordsKryo
 
 class TheWarOfWordsMiner extends Miner {
 	
 	static val log = LoggerFactory.getLogger(TheWarOfWordsMiner)
 	
 	new(List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
-		super(log, TheWarOfWordsNode.configuration(), [TheWarOfWordsNode.kryo()], trackers, nodePort, keys)
+		super(log, TheWarOfWordsNode.configuration(), [TheWarOfWordsKryo.kryo()], trackers, nodePort, keys)
 	}
 
 	def static void main(String[] args) {
