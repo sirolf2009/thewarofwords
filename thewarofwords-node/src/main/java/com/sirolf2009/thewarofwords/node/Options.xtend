@@ -8,7 +8,7 @@ import org.eclipse.xtend.lib.annotations.ToString
 @Accessors @ToString class Options {
 	
 	@Option(names=#["-t", "--trackers"], description="A list of trackers to connect to", paramLabel="IP:PORT")
-	var List<String> trackers = #["localhost:2012"]
+	var List<String> trackers = #["thewarofwords.com:2012"]
 	
 	@Option(names=#["-p", "--port"], description="The port to host on", paramLabel="PORT")
 	var int port = 4567
