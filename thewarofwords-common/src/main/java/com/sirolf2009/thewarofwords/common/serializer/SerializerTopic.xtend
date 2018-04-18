@@ -11,7 +11,7 @@ class SerializerTopic extends Serializer<Topic> {
 	override read(Kryo kryo, Input input, Class<Topic> type) {
 		val name = input.readString()
 		val description = input.readString()
-		val tags = (0 ..< input.readShort).map[input.readString()].toList()
+		val tags = (0 ..< input.readShort).map[input.readString()].toSet()
 		return new Topic(name, description, tags)
 	}
 	

@@ -123,7 +123,7 @@ import java.util.TreeSet
 		[:find [?e ...]
 		 :where [?e topic/hash _]]''')
 		response.map[database.entity(it)].map [
-			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/description") as String, (get(":topic/tags") as Set<String>).toList())
+			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/description") as String, get(":topic/tags") as Set<String>)
 		].toMap([key], [value])
 	}
 
@@ -215,7 +215,7 @@ import java.util.TreeSet
 		val name = entity.get(":topic/name") as String
 		val description = entity.get(":topic/description") as String
 		val tags = entity.get(":topic/tags") as Set<String>
-		return new Topic(name, description, tags.toList())
+		return new Topic(name, description, tags)
 	}
 	
 	def parseSource(Object blockID) {

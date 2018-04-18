@@ -36,7 +36,7 @@ class TheWarOfWordsFacade {
 	}
 	
 	def postTopic(String topic, String description, String... tags) {
-		postTopic(new Topic(topic, description, tags))
+		postTopic(new Topic(topic, description, tags.toSet()))
 	}
 	
 	def postTopic(Topic topic) {
