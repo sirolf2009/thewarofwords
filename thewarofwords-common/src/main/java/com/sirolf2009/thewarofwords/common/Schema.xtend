@@ -55,8 +55,12 @@ class Schema {
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db/unique :db.unique/identity}
-
+  
  {:db/ident :topic/name
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one}
+  
+ {:db/ident :topic/description
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one}
   
