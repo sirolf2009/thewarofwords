@@ -47,6 +47,7 @@ import java.util.TreeSet
 			'''
 			{:topic/hash "«mutation.hash(kryo).toHexString()»"
 			 :topic/name "«name»"
+			 :topic/description "«description»"
 			 «IF !tags.empty»
 			 	:topic/tags [«tags.map['''"«it»"'''].join(" ")»]
 			 «ENDIF»
@@ -122,7 +123,7 @@ import java.util.TreeSet
 		[:find [?e ...]
 		 :where [?e topic/hash _]]''')
 		response.map[database.entity(it)].map [
-			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, (get(":topic/tags") as Set<String>).toList())
+			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/description") as String, (get(":topic/tags") as Set<String>).toList())
 		].toMap([key], [value])
 	}
 
@@ -212,8 +213,9 @@ import java.util.TreeSet
 	def parseTopic(Object blockID) {
 		val entity = database.entity(blockID)
 		val name = entity.get(":topic/name") as String
+		val description = entity.get(":topic/description") as String
 		val tags = entity.get(":topic/tags") as Set<String>
-		return new Topic(name, tags.toList())
+		return new Topic(name, description, tags.toList())
 	}
 	
 	def parseSource(Object blockID) {

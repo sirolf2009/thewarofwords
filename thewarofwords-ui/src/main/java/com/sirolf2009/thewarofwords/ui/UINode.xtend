@@ -30,19 +30,19 @@ import javafx.beans.property.SimpleIntegerProperty
 	
 	override synchronized onNewConnection(Kryo kryo, Connection connection) {
 		isConnected.set(true)
-		nodes.add(1)
+		nodes.set(nodes.get()+1)
 		super.onNewConnection(kryo, connection)
 	}
 	
 	override onDisconnected(Connection connection) {
-		nodes.subtract(1)
+		nodes.set(Math.max(0, nodes.get()-1))
 		if(nodes.get() == 0) {
 			isConnected.set(false)
 		}
 		super.onDisconnected(connection)
 	}
 	
-	override onBranchExpanded() {
+	override onBlockchainExpanded() {
 		lastBlock.set(hash(blockchain.mainBranch.getLastBlock()).toHexString())
 	}
 	

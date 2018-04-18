@@ -25,7 +25,11 @@ class MainController {
 	def void initialize() {
 		node = new UINode(#[new InetSocketAddress("thewarofwords.com", 2012)], 4567, getKeys())
 		facade = new TheWarOfWordsFacade(node)
-		new Thread[node.start()].start()
+		new Thread[node.start()] => [
+			daemon = true
+			name = "Node"
+			start()
+		]
 		
 		lblIsConnected.textProperty().bind(node.getIsConnected().asString())
 		lblLastBlock.textProperty().bind(node.getLastBlock())

@@ -6,6 +6,7 @@ import org.eclipse.xtend.lib.annotations.Data
 @Data class Topic {
 	
 	val String name
+	val String description
 	val List<String> tags
 	
 }
