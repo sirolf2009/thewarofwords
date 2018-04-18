@@ -37,7 +37,7 @@ class TestTopicSourceRefer {
 
 	@Test
 	def void testTopicSource() {
-		node.submitMutation(new Topic("Test Topic", #["test", "topic"]))
+		node.submitMutation(new Topic("Test Topic", "description", #["test", "topic"]))
 		node.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "All you're base are belong to us"))
 		sleep(2000)
 
@@ -46,6 +46,7 @@ class TestTopicSourceRefer {
 			val topics = state.topics
 			assertEquals(1, topics.size())
 			assertEquals("Test Topic", topics.values.get(0).name)
+			assertEquals("description", topics.values.get(0).description)
 			val tags = topics.values.get(0).tags
 			assertEquals(2, tags.size())
 			assertTrue(tags.contains("test"))
@@ -61,11 +62,11 @@ class TestTopicSourceRefer {
 
 	@Test
 	def void testTopicSourceRefer() {
-		val genericProject = node.submitMutation(new Topic("Generic Projects", #["generic", "projects"]))
+		val genericProject = node.submitMutation(new Topic("Generic Projects", "description", #["generic", "projects"]))
 		val genericSource = node.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/objectchain"), "This allows you to do a lot!"))
 		node.submitMutation(new Reference(node.get().hash(genericProject), node.get().hash(genericSource)))
 		
-		val specificProject = node.submitMutation(new Topic("Practical Projects", #["practical", "projects"]))
+		val specificProject = node.submitMutation(new Topic("Practical Projects", "description", #["practical", "projects"]))
 		val specificSource = node.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "This allows you to do one thing very easily!"))
 		node.submitMutation(new Reference(node.get().hash(specificProject), node.get().hash(specificSource)))
 		
