@@ -10,7 +10,6 @@
 	<modules>
 		<module>thewarofwords-common</module>
 		<module>thewarofwords-node</module>
-		<module>thewarofwords-restnode</module>
 		<module>thewarofwords-miner</module>
 		<module>thewarofwords-tests</module>
     	<module>thewarofwords-ui</module>

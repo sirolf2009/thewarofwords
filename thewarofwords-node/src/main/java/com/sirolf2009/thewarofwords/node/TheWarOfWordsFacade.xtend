@@ -35,8 +35,8 @@ class TheWarOfWordsFacade {
 		return state.getSources(topicHash)
 	}
 	
-	def postTopic(String topic, String... tags) {
-		postTopic(new Topic(topic, tags))
+	def postTopic(String topic, String description, String... tags) {
+		postTopic(new Topic(topic, description, tags.toSet()))
 	}
 	
 	def postTopic(Topic topic) {

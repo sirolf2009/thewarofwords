@@ -51,11 +51,13 @@ class TestState {
 	@Test
 	def void testAddTopic() {
 		val state = emptyState()
-		val topic = new Mutation(new Topic("Topic", #["a", "b", "c"]), kryo(), Keys.generateAssymetricPair())
+		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet()), kryo(), Keys.generateAssymetricPair())
 		val block = new Block(new BlockHeader(#[], #[], new Date(), BigInteger.ONE, 0), new TreeSet(#[topic]))
 		val newState = state.apply(kryo(), block) as State
 		assertFalse(newState.getTopics().empty)
-		assertEquals("Topic", newState.getTopics().get(topic.hash(kryo()).toHexString()).name)
+		val newStateTopic = newState.getTopics().get(topic.hash(kryo()).toHexString())
+		assertEquals("Topic", newStateTopic.name)
+		assertEquals("description", newStateTopic.description)
 		assertEquals(#["a", "b", "c"], newState.getTopics().get(topic.hash(kryo()).toHexString()).tags)
 		assertTrue(newState.getSources().empty)
 	}
@@ -92,7 +94,7 @@ class TestState {
 	def void testRefer() {
 		val state = emptyState()
 		val keys = Keys.generateAssymetricPair()
-		val topic = new Mutation(new Topic("Topic", #["a", "b", "c"]), kryo(), keys)
+		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet()), kryo(), keys)
 		val source = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009/thewarofwords"), "comment"), kryo(), keys)
 		val block = new Block(new BlockHeader(#[], #[], new Date(), BigInteger.ONE, 0), new TreeSet() => [
 			addAll(topic, source)

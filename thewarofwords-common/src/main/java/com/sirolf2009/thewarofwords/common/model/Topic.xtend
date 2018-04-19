@@ -1,11 +1,16 @@
 package com.sirolf2009.thewarofwords.common.model
 
-import java.util.List
+import java.util.Set
 import org.eclipse.xtend.lib.annotations.Data
 
 @Data class Topic {
 	
 	val String name
-	val List<String> tags
+	val String description
+	val Set<String> tags
+	
+	def verify() {
+		return !name.isEmpty() && !description.isEmpty()
+	}
 	
 }
