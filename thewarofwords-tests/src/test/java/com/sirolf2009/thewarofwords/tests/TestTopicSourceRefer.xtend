@@ -73,12 +73,7 @@ class TestTopicSourceRefer {
 		node1.submitMutation(new Reference(node1.get().hash(specificProject), node1.get().hash(specificSource)))
 		
 		node2.awaitNewBlock()
-
-		node1.getLastState() => [
-			val sources = getSources(node2.get().hash(genericProject).toHexString())
-			assertEquals(1, sources.size())
-			assertEquals("https://github.com/sirolf2009/objectchain", sources.values.get(0).value.source.toString())
-		]
+		
 		node2.getLastState() => [
 			val sources = getSources(node2.get().hash(specificProject).toHexString())
 			assertEquals(1, sources.size())
