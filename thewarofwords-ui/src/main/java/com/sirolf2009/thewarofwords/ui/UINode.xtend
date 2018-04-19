@@ -20,12 +20,14 @@ import javafx.application.Platform
 @Accessors class UINode extends TheWarOfWordsNode {
 
 	val BooleanProperty isConnected
+	val BooleanProperty isSynchronised
 	val StringProperty lastBlock
 	val IntegerProperty nodes
 
 	new(List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
 		super(trackers, nodePort, keys)
 		isConnected = new SimpleBooleanProperty(false)
+		isSynchronised = new SimpleBooleanProperty(false)
 		lastBlock = new SimpleStringProperty()
 		nodes = new SimpleIntegerProperty(0)
 	}
@@ -49,6 +51,10 @@ import javafx.application.Platform
 
 	override onBlockchainExpanded() {
 		lastBlock.set(hash(blockchain.mainBranch.getLastBlock()).toHexString())
+	}
+	
+	override onSynchronised() {
+		isSynchronised.set(true)
 	}
 
 }

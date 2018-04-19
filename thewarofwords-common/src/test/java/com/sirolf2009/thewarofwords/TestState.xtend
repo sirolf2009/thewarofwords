@@ -58,7 +58,7 @@ class TestState {
 		val newStateTopic = newState.getTopics().get(topic.hash(kryo()).toHexString())
 		assertEquals("Topic", newStateTopic.name)
 		assertEquals("description", newStateTopic.description)
-		assertEquals(#["a", "b", "c"], newState.getTopics().get(topic.hash(kryo()).toHexString()).tags)
+		assertEquals(#["a", "b", "c"].toSet(), newState.getTopics().get(topic.hash(kryo()).toHexString()).tags)
 		assertTrue(newState.getSources().empty)
 	}
 	

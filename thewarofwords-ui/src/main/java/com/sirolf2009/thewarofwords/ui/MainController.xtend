@@ -1,9 +1,9 @@
 package com.sirolf2009.thewarofwords.ui
 
 import com.sirolf2009.objectchain.common.crypto.Keys
+import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsFacade
 import com.sirolf2009.thewarofwords.ui.component.NewTopic
-import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 import java.io.File
 import java.net.InetSocketAddress
 import java.nio.file.Files
@@ -14,13 +14,15 @@ import javafx.scene.Node
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import org.apache.logging.log4j.LogManager
+import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.ui.component.TopicsOverview
 
 class MainController {
 
 	static val log = LogManager.logger
 	var UINode node
 	var TheWarOfWordsFacade facade
-	@FXML var AnchorPane newsContent
+	@FXML var AnchorPane newsContent //turn into stackpane for android style return?
 	@FXML var Label lblIsConnected
 	@FXML var Label lblLastBlock
 	@FXML var Label lblNodeCount
@@ -34,14 +36,27 @@ class MainController {
 			name = "Node"
 			start()
 		]
+		node.getIsSynchronised().addListener[
+			if(node.getIsSynchronised().get()) {
+				loadTopics()
+			}
+		]
 
 		lblIsConnected.textProperty().bind(node.getIsConnected().asString())
 		lblLastBlock.textProperty().bind(node.getLastBlock())
 		lblNodeCount.textProperty().bind(node.getNodes().asString())
 	}
 	
+	def showTopic(String topicHash, Topic topic) {
+		//TODO
+	}
+	
+	def showSource(String sourceHash, Source source) {
+		//TODO
+	}
+	
 	def loadTopics() {
-		setNewsContent(new TopicOverview(facade.getTopics))
+		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
 
 	def newTopic() {
