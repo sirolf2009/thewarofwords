@@ -1,6 +1,5 @@
 package com.sirolf2009.thewarofwords.tests
 
-import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
@@ -44,17 +43,18 @@ class TestUpvote {
 		
 		val topic = node1.submitMutation(new Topic("Test Topic", "desription", #["test", "topic"].toSet()))
 		val source = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "All you're base are belong to us"))
-		sleep(5000)
+		
+		node2.awaitNewBlock()
 		
 		val topicHash = node2.get().hash(topic)
 		val sourceHash = node2.get().hash(source)
 		node2.submitMutation(new Upvote(node2.get().keys.public, sourceHash, topicHash))
 		node3.submitMutation(new Upvote(node3.get().keys.public, sourceHash, topicHash))
-		sleep(5000)
 		
-		node1.get() => [
-			val state = blockchain.mainBranch.lastState as State
-			assertEquals(2, state.getUpvotes(node1.get().keys.public).size())
+		node2.awaitNewBlock()
+		
+		node1.getLastState() => [
+			assertEquals(2, getUpvotes(node1.get().keys.public).size())
 		]
 	}
 	

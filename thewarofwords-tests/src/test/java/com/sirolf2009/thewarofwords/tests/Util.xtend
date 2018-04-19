@@ -6,8 +6,33 @@ import com.sirolf2009.thewarofwords.node.TheWarOfWordsNode
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsTracker
 import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicReference
+import com.sirolf2009.thewarofwords.common.State
 
 class Util {
+	
+	def static awaitNewBlock(AtomicReference<TheWarOfWordsNode> node) {
+		val currentBlock = node.getLastBlock()
+		var int attempt = 0
+		while(true) {
+			Thread.sleep(1000)
+			if(node.getLastBlock() != currentBlock) {
+				return
+			} else {
+				attempt += 1
+				if(attempt == 10) {
+					throw new IllegalStateException("No new block received")
+				}
+			}
+		}
+	}
+	
+	def static getLastBlock(AtomicReference<TheWarOfWordsNode> node) {
+		return node.get().getBlockchain().getMainBranch().getLastBlock()
+	}
+	
+	def static getLastState(AtomicReference<TheWarOfWordsNode> node) {
+		return node.get().getBlockchain().getMainBranch().getLastState() as State
+	}
 	
 	def static submitMutation(AtomicReference<TheWarOfWordsNode> node, Object object) {
 		node.get().submitMutation(object)

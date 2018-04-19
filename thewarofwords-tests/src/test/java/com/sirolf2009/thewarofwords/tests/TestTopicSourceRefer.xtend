@@ -1,6 +1,5 @@
 package com.sirolf2009.thewarofwords.tests
 
-import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
@@ -41,11 +40,10 @@ class TestTopicSourceRefer {
 	def void testTopicSource() {
 		node1.submitMutation(new Topic("Test Topic", "description", #["test", "topic"].toSet()))
 		node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "All you're base are belong to us"))
-		sleep(2000)
+		
+		node2.awaitNewBlock()
 
-		node2.get() => [
-			val state = blockchain.mainBranch.lastState as State
-			val topics = state.topics
+		node2.getLastState() => [
 			assertEquals(1, topics.size())
 			assertEquals("Test Topic", topics.values.get(0).name)
 			assertEquals("description", topics.values.get(0).description)
@@ -54,7 +52,6 @@ class TestTopicSourceRefer {
 			assertTrue(tags.contains("test"))
 			assertTrue(tags.contains("topic"))
 
-			val sources = state.sources
 			assertEquals(1, sources.size())
 			assertEquals(SourceType.ARTICLE, sources.values.get(0).value.sourceType)
 			assertEquals("https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
@@ -70,19 +67,20 @@ class TestTopicSourceRefer {
 		
 		val specificProject = node1.submitMutation(new Topic("Practical Projects", "description", #["practical", "projects"].toSet()))
 		val specificSource = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "This allows you to do one thing very easily!"))
+		
+		node2.awaitNewBlock()
+		
 		node1.submitMutation(new Reference(node1.get().hash(specificProject), node1.get().hash(specificSource)))
 		
-		sleep(2000)
+		node2.awaitNewBlock()
 
-		node2.get() => [
-			val state = blockchain.mainBranch.lastState as State
-			val sources = state.getSources(node2.get().hash(genericProject).toHexString())
+		node1.getLastState() => [
+			val sources = getSources(node2.get().hash(genericProject).toHexString())
 			assertEquals(1, sources.size())
 			assertEquals("https://github.com/sirolf2009/objectchain", sources.values.get(0).value.source.toString())
 		]
-		node2.get() => [
-			val state = blockchain.mainBranch.lastState as State
-			val sources = state.getSources(node2.get().hash(specificProject).toHexString())
+		node2.getLastState() => [
+			val sources = getSources(node2.get().hash(specificProject).toHexString())
 			assertEquals(1, sources.size())
 			assertEquals("https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
 		]
