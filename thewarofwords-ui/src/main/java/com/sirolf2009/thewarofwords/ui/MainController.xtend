@@ -16,13 +16,17 @@ import javafx.scene.layout.AnchorPane
 import org.apache.logging.log4j.LogManager
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.ui.component.TopicsOverview
+import javafx.application.Platform
+import org.eclipse.xtend.lib.annotations.Accessors
+import com.sirolf2009.thewarofwords.ui.component.TopicOverview
+import com.sirolf2009.thewarofwords.ui.component.NewSource
 
 class MainController {
 
 	static val log = LogManager.logger
-	var UINode node
-	var TheWarOfWordsFacade facade
-	@FXML var AnchorPane newsContent //turn into stackpane for android style return?
+	@Accessors var UINode node
+	@Accessors var TheWarOfWordsFacade facade
+	@FXML var AnchorPane newsContent // turn into stackpane for android style return?
 	@FXML var Label lblIsConnected
 	@FXML var Label lblLastBlock
 	@FXML var Label lblNodeCount
@@ -36,9 +40,11 @@ class MainController {
 			name = "Node"
 			start()
 		]
-		node.getIsSynchronised().addListener[
+		node.getIsSynchronised().addListener [
 			if(node.getIsSynchronised().get()) {
-				loadTopics()
+				Platform.runLater [
+					loadTopics()
+				]
 			}
 		]
 
@@ -46,19 +52,30 @@ class MainController {
 		lblLastBlock.textProperty().bind(node.getLastBlock())
 		lblNodeCount.textProperty().bind(node.getNodes().asString())
 	}
-	
+
 	def showTopic(String topicHash, Topic topic) {
-		//TODO
+		setNewsContent(new TopicOverview(this, topicHash, topic))
 	}
-	
+
 	def showSource(String sourceHash, Source source) {
-		//TODO
+		// TODO
 	}
-	
+
+
 	def loadTopics() {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
 
+	def newSource() {
+		setNewsContent(new NewSource() [ source |
+			try {
+				source.verify()
+				new Thread[facade.postSource(source)].start()
+			} catch(Exception e) {
+			}
+		])
+	}
+	
 	def newTopic() {
 		setNewsContent(new NewTopic() [ topic |
 			if(topic.verify()) {

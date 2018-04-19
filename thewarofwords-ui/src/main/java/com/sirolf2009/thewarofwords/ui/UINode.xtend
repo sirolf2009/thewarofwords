@@ -50,9 +50,11 @@ import javafx.application.Platform
 	}
 
 	override onBlockchainExpanded() {
-		lastBlock.set(hash(blockchain.mainBranch.getLastBlock()).toHexString())
+		Platform.runLater [
+			lastBlock.set(hash(blockchain.mainBranch.getLastBlock()).toHexString())
+		]
 	}
-	
+
 	override onSynchronised() {
 		isSynchronised.set(true)
 	}
