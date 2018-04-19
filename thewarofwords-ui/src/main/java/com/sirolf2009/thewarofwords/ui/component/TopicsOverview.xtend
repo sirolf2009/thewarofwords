@@ -8,6 +8,7 @@ import javafx.scene.layout.FlowPane
 class TopicsOverview extends FlowPane {
 	
 	new(MainController controller, Map<String, Topic> topics) {
+		styleClass += "newsContentItem"
 		topics.forEach[hash, topic|
 			getChildren().add(new TopicCard(controller, hash, topic))
 		]

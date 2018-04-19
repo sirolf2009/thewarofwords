@@ -1,32 +1,36 @@
 package com.sirolf2009.thewarofwords.ui
 
 import com.sirolf2009.objectchain.common.crypto.Keys
+import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsFacade
+import com.sirolf2009.thewarofwords.ui.component.NewSource
 import com.sirolf2009.thewarofwords.ui.component.NewTopic
+import com.sirolf2009.thewarofwords.ui.component.TopicOverview
+import com.sirolf2009.thewarofwords.ui.component.TopicsOverview
 import java.io.File
 import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyPair
+import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.Node
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.StackPane
 import org.apache.logging.log4j.LogManager
-import com.sirolf2009.thewarofwords.common.model.Source
-import com.sirolf2009.thewarofwords.ui.component.TopicsOverview
-import javafx.application.Platform
 import org.eclipse.xtend.lib.annotations.Accessors
-import com.sirolf2009.thewarofwords.ui.component.TopicOverview
-import com.sirolf2009.thewarofwords.ui.component.NewSource
+import javafx.beans.binding.Bindings
 
 class MainController {
 
 	static val log = LogManager.logger
 	@Accessors var UINode node
 	@Accessors var TheWarOfWordsFacade facade
-	@FXML var AnchorPane newsContent // turn into stackpane for android style return?
+	@FXML var Button popButton
+	@FXML var StackPane newsContent
 	@FXML var Label lblIsConnected
 	@FXML var Label lblLastBlock
 	@FXML var Label lblNodeCount
@@ -47,6 +51,8 @@ class MainController {
 				]
 			}
 		]
+		
+		popButton.disableProperty().bind(Bindings.lessThan(Bindings.size(newsContent.getChildren()), 2))
 
 		lblIsConnected.textProperty().bind(node.getIsConnected().asString())
 		lblLastBlock.textProperty().bind(node.getLastBlock())
@@ -65,7 +71,7 @@ class MainController {
 	def loadTopics() {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
-
+	
 	def newSource() {
 		setNewsContent(new NewSource() [ source |
 			try {
@@ -83,12 +89,13 @@ class MainController {
 			}
 		])
 	}
+	
+	@FXML def pop() {
+		newsContent.getChildren().remove(newsContent.getChildren().last())
+	}
 
 	def setNewsContent(Node node) {
-		newsContent.getChildren() => [
-			clear()
-			add(node.maximize())
-		]
+		newsContent.getChildren().add(node)
 	}
 
 	def static getKeys() {
@@ -107,6 +114,7 @@ class MainController {
 		return new KeyPair(Keys.readPublicKeyFromFile(publicKey), Keys.readPrivateKeyFromFile(privateKey))
 	}
 
+	
 	def static maximize(Node node) {
 		AnchorPane.setTopAnchor(node, 0d)
 		AnchorPane.setRightAnchor(node, 0d)

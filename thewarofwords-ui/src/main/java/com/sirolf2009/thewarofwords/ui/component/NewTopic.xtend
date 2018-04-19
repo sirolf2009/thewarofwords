@@ -18,6 +18,7 @@ class NewTopic extends MigPane {
 
 	new(Consumer<Topic> onSubmitted) {
 		super("", "[][right]")
+		styleClass += "newsContentItem"
 		add(new Label("Name"), "shrink 0")
 		add(new TextField() => [
 			name.bind(textProperty())

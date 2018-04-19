@@ -11,6 +11,7 @@ class TopicOverview extends MigPane {
 
 	new(MainController controller, String topicHash, Topic topic) {
 		super("fillx")
+		styleClass += "newsContentItem"
 		add(new Label(topic.getName()), "span, center, wrap")
 		add(new Label(topic.getDescription()), "span 2")
 		add(new Button("Add source") => [

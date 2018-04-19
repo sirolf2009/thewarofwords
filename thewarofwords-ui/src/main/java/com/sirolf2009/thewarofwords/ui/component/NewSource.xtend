@@ -22,6 +22,7 @@ class NewSource extends MigPane {
 
 	new(Consumer<Source> onSubmitted) {
 		super("fillx")
+		styleClass += "newsContentItem"
 		add(new Label("URL"))
 		add(new TextField() => [
 			url.bind(textProperty())

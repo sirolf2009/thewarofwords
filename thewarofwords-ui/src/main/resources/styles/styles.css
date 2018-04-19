@@ -8,6 +8,10 @@
   -fx-border-color: transparent;
 }
 
+.newsContentItem {
+	-fx-background-color: white ;
+}
+
 .network-grid {
 	-fx-padding: 16px;
 }
