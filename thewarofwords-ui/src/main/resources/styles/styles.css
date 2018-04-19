@@ -11,3 +11,17 @@
 .network-grid {
 	-fx-padding: 16px;
 }
+
+.card {
+	-fx-border-color: linear-gradient(from 50% 0% to 50% 100%, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 99%, rgba(0, 0, 0, 0.1) 100%);
+	-fx-border-width: 1px 1px 2px 1px;
+	-fx-border-style: solid ;
+	-fx-padding: 2px;
+}
+.card .title {
+	-fx-font-size: 1.1em;
+}
+.card .description {
+	-fx-font-size: 0.9em;
+	-fx-text-fill: rgb(120, 120, 120)
+}
