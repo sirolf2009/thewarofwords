@@ -76,7 +76,7 @@ class TestTopicSourceRefer {
 		
 		node2.getLastState() => [
 			val sources = getSources(node2.get().hash(specificProject).toHexString())
-			assertEquals(1, sources.size())
+			assertEquals("There is only 1 source in "+sources, 1, sources.size())
 			assertEquals("https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
 		]
 	}

@@ -6,8 +6,7 @@ import com.sirolf2009.objectchain.common.model.Mutation
 import com.sirolf2009.objectchain.node.Node
 import com.sirolf2009.thewarofwords.common.Schema
 import com.sirolf2009.thewarofwords.common.State
-import com.sirolf2009.thewarofwords.common.model.Source
-import com.sirolf2009.thewarofwords.common.model.Upvote
+import com.sirolf2009.thewarofwords.common.model.IVerifiable
 import datomic.Peer
 import java.io.File
 import java.net.InetSocketAddress
@@ -17,8 +16,7 @@ import org.slf4j.LoggerFactory
 import picocli.CommandLine
 
 import static com.sirolf2009.thewarofwords.common.TheWarOfWordsKryo.*
-
-import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+import com.sirolf2009.objectchain.common.model.Block
 
 class TheWarOfWordsNode extends Node {
 
@@ -27,23 +25,38 @@ class TheWarOfWordsNode extends Node {
 	new(List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
 		super(log, configuration(), [kryo()], trackers, nodePort, keys)
 	}
-	
+
 	override isValid(Mutation mutation) {
-		val state = blockchain.mainBranch.lastState as State
-		if(mutation.object instanceof Source) {
+		if(mutation.object instanceof IVerifiable) {
 			try {
-				(mutation.object as Source).verify()
+				(mutation.object as IVerifiable) => [
+					verifyStatic()
+					kryoPool.run [kryo|
+						verifyBytes(kryo)
+						return null
+					]
+				]
 				return true
 			} catch(Exception e) {
-				log.error("Failed to verify source mutation", e)
+				log.error("Failed to verify mutation", e)
 				return false
 			}
-		} else if(mutation.object instanceof Upvote) {
-			try {
-				return !state.getSource((mutation.object as Upvote).sourceHash.toHexString()).isEmpty()
-			} catch(Exception e) {
-				log.error("Failed to verify upvote mutation", e)
-				return false
+		}
+		return true
+	}
+	
+	override isValid(Block block) {
+		for (mutation : block.mutations) {
+			if(mutation instanceof IVerifiable) {
+				try {
+					kryoPool.run [kryo|
+						(mutation as IVerifiable).verifyInBlock(block, kryo)
+						return null
+					]
+				} catch(Exception e) {
+					log.error("Failed to verify mutation", e)
+					return false
+				}
 			}
 		}
 		return true
@@ -66,7 +79,7 @@ class TheWarOfWordsNode extends Node {
 				log.error("Invalid data format: " + it)
 				CommandLine.usage(new Options(), System.out)
 				System.exit(-1)
-				return null //wow, java
+				return null // wow, java
 			} else {
 				return new InetSocketAddress(data.get(0), Integer.parseInt(data.get(1)))
 			}

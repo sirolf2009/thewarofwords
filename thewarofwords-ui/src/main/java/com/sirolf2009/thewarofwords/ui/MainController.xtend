@@ -75,7 +75,7 @@ class MainController {
 	def newSource() {
 		setNewsContent(new NewSource() [ source |
 			try {
-				source.verify()
+				source.verifyStatic()
 				new Thread[facade.postSource(source)].start()
 			} catch(Exception e) {
 			}
