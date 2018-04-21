@@ -8,8 +8,9 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.util.ToStringBuilder
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+import com.sirolf2009.objectchain.common.interfaces.IHashable
 
-@Data class Reference implements IVerifiable {
+@Data class Reference implements IVerifiable, IHashable {
 
 	val List<Byte> topic
 	val List<Byte> source

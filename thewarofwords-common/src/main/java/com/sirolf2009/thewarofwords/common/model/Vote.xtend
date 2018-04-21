@@ -6,8 +6,9 @@ import org.eclipse.xtend.lib.annotations.Data
 import com.sirolf2009.objectchain.common.exception.VerificationException
 import com.esotericsoftware.kryo.Kryo
 import com.sirolf2009.objectchain.common.model.Block
+import com.sirolf2009.objectchain.common.interfaces.IHashable
 
-@Data class Vote implements IVerifiable {
+@Data class Vote implements IVerifiable, IHashable {
 	
 	val List<Byte> poll
 	val PublicKey voter

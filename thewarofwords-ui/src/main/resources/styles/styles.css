@@ -1,8 +1,17 @@
+/*
+ * Colors:
+ * prussian blue: #0b3954
+ * purple taupe: #52414c
+ * pastel red: #ff6663
+ * eerie black: #0d1321
+ * steel teal: #558c8c
+ */
+
 .main-tab *.tab-label {
-    -fx-rotate: 90;
+    -fx-rotate: 90.0;
 }
 .main-tab *.tab {
-    -fx-padding: 4em 1em 4em 1em;
+    -fx-padding: 4.0em 1.0em 4.0em 1.0em;
 }
 .main-tab:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
   -fx-border-color: transparent;
@@ -13,19 +22,37 @@
 }
 
 .network-grid {
-	-fx-padding: 16px;
+	-fx-padding: 16.0px;
 }
 
-.card {
-	-fx-border-color: linear-gradient(from 50% 0% to 50% 100%, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 99%, rgba(0, 0, 0, 0.1) 100%);
-	-fx-border-width: 1px 1px 2px 1px;
-	-fx-border-style: solid ;
-	-fx-padding: 2px;
+.topicOverview > .title {
+	-fx-font-size: 4em;
+	-fx-background-color: #0b3954;
+	-fx-text-fill: #ff6663;
+}
+.topicOverview > .description {
+	-fx-font-size: 0.9em;
+	-fx-text-fill: rgb(120.0, 120.0, 120.0)
+}
+
+.card .border {
+	-fx-border-color: rgb(200,200,200);
+	-fx-border-width: 1;
+	-fx-effect: dropshadow(three-pass-box, #0d1321, 10, 0, 4, 4);
+}
+.card .card-content {
+	-fx-padding: 12;
+	-fx-background-insets: 1;
+	-fx-background-color: white;
 }
 .card .title {
 	-fx-font-size: 1.1em;
 }
 .card .description {
 	-fx-font-size: 0.9em;
-	-fx-text-fill: rgb(120, 120, 120)
+	-fx-text-fill: rgb(120.0, 120.0, 120.0)
+}
+
+.citation {
+	-fx-font-size: 1.4em;
 }

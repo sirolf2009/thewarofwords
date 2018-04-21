@@ -23,6 +23,7 @@ import javafx.scene.layout.StackPane
 import org.apache.logging.log4j.LogManager
 import org.eclipse.xtend.lib.annotations.Accessors
 import javafx.beans.binding.Bindings
+import com.sirolf2009.objectchain.common.crypto.Hashing
 
 class MainController {
 
@@ -72,11 +73,15 @@ class MainController {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
 	
-	def newSource() {
+	def newSource(String topicHash, Topic topic) {
 		setNewsContent(new NewSource() [ source |
 			try {
 				source.verifyStatic()
-				new Thread[facade.postSource(source)].start()
+				new Thread[
+					val newSource = facade.postSource(source)
+					facade.refer(topicHash, Hashing.toHexString(node.hash(newSource)))
+				].start()
+				pop()
 			} catch(Exception e) {
 			}
 		])

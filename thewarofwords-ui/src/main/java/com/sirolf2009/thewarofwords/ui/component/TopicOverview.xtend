@@ -6,22 +6,38 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.FlowPane
 import org.tbee.javafx.scene.layout.MigPane
+import com.sirolf2009.thewarofwords.common.model.SourceType
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 
 class TopicOverview extends MigPane {
 
 	new(MainController controller, String topicHash, Topic topic) {
 		super("fillx")
-		styleClass += "newsContentItem"
-		add(new Label(topic.getName()), "span, center, wrap")
-		add(new Label(topic.getDescription()), "span 2")
+		styleClass += #["newsContentItem", "topicOverview"]
+		add(new Label(topic.getName()) => [
+			styleClass += "title"
+			alignment = Pos.CENTER
+		], "span, wrap, growx")
+		add(new Label(topic.getDescription()) => [
+			styleClass += "description"
+		], "span 2, growx")
 		add(new Button("Add source") => [
-			onAction = [controller.newSource()]
+			onAction = [controller.newSource(topicHash, topic)]
 		], "wrap, right")
 		add(new FlowPane() => [
-			controller.getFacade().getSources(topicHash).forEach [hash, sourceAndKey|
-				getChildren().add(new ArticleCard(sourceAndKey.getValue()))
+			controller.getFacade().getSources(topicHash).forEach [ hash, sourceAndKey |
+				if(sourceAndKey.getValue().getSourceType() == SourceType.CITATION) {
+					getChildren().add(new CitationCard(sourceAndKey.getValue()) => [
+						FlowPane.setMargin(it, new Insets(4))
+					])
+				} else {
+					getChildren().add(new ArticleCard(sourceAndKey.getValue()) => [
+						FlowPane.setMargin(it, new Insets(4))
+					])
+				}
 			]
-		], "growy")
+		], "span, grow")
 	}
 
 }

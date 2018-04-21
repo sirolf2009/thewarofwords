@@ -6,8 +6,9 @@ import com.sirolf2009.thewarofwords.common.exception.SourceVerificationException
 import com.sirolf2009.objectchain.common.exception.VerificationException
 import com.esotericsoftware.kryo.Kryo
 import com.sirolf2009.objectchain.common.model.Block
+import com.sirolf2009.objectchain.common.interfaces.IHashable
 
-@Data class Source implements IVerifiable {
+@Data class Source implements IVerifiable, IHashable {
 
 	val SourceType sourceType
 	val URL source
