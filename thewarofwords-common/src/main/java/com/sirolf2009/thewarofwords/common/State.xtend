@@ -143,6 +143,15 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		 		[?block block/number ?b]]
 		''').get(0)
 	}
+	
+	def hasUpvoted(PublicKey key, Hash source, Hash topic) {
+		query('''
+		[:find ?t
+		 :where [?t upvote/voter "«key.encoded.toHexString()»"]
+		 		[?t upvote/topic "«topic»"]
+		 		[?t upvote/source "«source»"]]
+		''').size() > 0
+	}
 
 	def getSources() {
 		query('''

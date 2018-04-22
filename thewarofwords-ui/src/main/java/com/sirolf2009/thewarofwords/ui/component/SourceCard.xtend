@@ -11,7 +11,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
 
 class SourceCard extends Card {
-	
+
 	static val emptyImage = new Image("images/heart-empty-16.png")
 	static val filledImage = new Image("images/heart-filled-16.png")
 
@@ -19,17 +19,20 @@ class SourceCard extends Card {
 		setHeader(new HBox() => [ container |
 			container.alignment = Pos.TOP_RIGHT
 			container.getChildren().add(new Pane() => [
-				val image = new ImageView(emptyImage) => [
+				val hasUpvoted = controller.getFacade().hasUpvoted(sourceHash, topicHash)
+				val image = new ImageView(if(hasUpvoted) filledImage else emptyImage) => [
 					fitWidth = 16
 					fitHeight = 16
 					HBox.setHgrow(it, Priority.ALWAYS)
 				]
 				getChildren().add(image)
-				onMouseClicked = [ e |
-					controller.getFacade().upvote(sourceHash, topicHash)
-					image.setImage(filledImage)
-					onMouseClicked = []
-				]
+				if(!hasUpvoted) {
+					onMouseClicked = [ e |
+						controller.getFacade().upvote(sourceHash, topicHash)
+						image.setImage(filledImage)
+						onMouseClicked = []
+					]
+				}
 			])
 		])
 	}

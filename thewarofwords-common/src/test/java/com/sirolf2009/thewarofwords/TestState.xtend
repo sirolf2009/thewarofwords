@@ -21,6 +21,7 @@ import org.junit.Test
 
 import static com.sirolf2009.thewarofwords.common.TheWarOfWordsKryo.*
 import static junit.framework.Assert.*
+import com.sirolf2009.thewarofwords.common.model.Upvote
 
 class TestState {
 
@@ -101,6 +102,24 @@ class TestState {
 		block.mutations.add(new Mutation(new Reference(topic.hash(kryo()), source.hash(kryo())), kryo(), keys))
 		val newState = state.apply(kryo(), block) as State
 		assertEquals(source.hash(kryo()), newState.getSources(topic.hash(kryo())).keySet.get(0))
+	}
+	
+	@Test
+	def void testUpvote() {
+		val state = emptyState()
+		val keys = Keys.generateAssymetricPair()
+		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet()), kryo(), keys)
+		val source1 = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009/thewarofwords"), "comment"), kryo(), keys)
+		val source2 = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009"), "comment"), kryo(), keys)
+		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet() => [
+			addAll(topic, source1, source2)
+		])
+		block.mutations.add(new Mutation(new Reference(topic.hash(kryo()), source1.hash(kryo())), kryo(), keys))
+		block.mutations.add(new Mutation(new Reference(topic.hash(kryo()), source2.hash(kryo())), kryo(), keys))
+		block.mutations.add(new Mutation(new Upvote(keys.public, source1.hash(kryo()), topic.hash(kryo())), kryo(), keys))
+		val newState = state.apply(kryo(), block) as State
+		assertEquals(true, newState.hasUpvoted(keys.public, source1.hash(kryo()), topic.hash(kryo())))
+		assertEquals(false, newState.hasUpvoted(keys.public, source2.hash(kryo()), topic.hash(kryo())))
 	}
 
 	def emptyState() {

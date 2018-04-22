@@ -35,6 +35,10 @@ class TheWarOfWordsFacade {
 		return state.getSources(topicHash)
 	}
 	
+	def hasUpvoted(Hash sourceHash, Hash topicHash) {
+		return state.hasUpvoted(node.keys.public, sourceHash, topicHash)
+	}
+	
 	def postTopic(String topic, String description, String... tags) {
 		postTopic(new Topic(topic, description, tags.toSet()))
 	}
