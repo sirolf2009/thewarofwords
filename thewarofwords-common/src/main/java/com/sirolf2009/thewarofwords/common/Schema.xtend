@@ -110,6 +110,20 @@ class Schema {
   		  		  		  
  {:db/ident :upvote/topic
   :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one}
+
+  
+ {:db/ident :account/key
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/identity}
+  		  		  
+ {:db/ident :account/username
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one}
+  		  		  
+ {:db/ident :account/credibility
+  :db/valueType :db.type/double
   :db/cardinality :db.cardinality/one}]'''))
 		txes.forEach [
 			conn.transact(it).get()

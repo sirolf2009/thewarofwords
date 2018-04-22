@@ -1,6 +1,7 @@
 package com.sirolf2009.thewarofwords.ui
 
 import com.sirolf2009.objectchain.common.crypto.Keys
+import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsFacade
@@ -14,6 +15,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyPair
 import javafx.application.Platform
+import javafx.beans.binding.Bindings
 import javafx.fxml.FXML
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -22,8 +24,6 @@ import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.StackPane
 import org.apache.logging.log4j.LogManager
 import org.eclipse.xtend.lib.annotations.Accessors
-import javafx.beans.binding.Bindings
-import com.sirolf2009.objectchain.common.crypto.Hashing
 
 class MainController {
 
@@ -56,11 +56,11 @@ class MainController {
 		popButton.disableProperty().bind(Bindings.lessThan(Bindings.size(newsContent.getChildren()), 2))
 
 		lblIsConnected.textProperty().bind(node.getIsConnected().asString())
-		lblLastBlock.textProperty().bind(node.getLastBlock())
+		lblLastBlock.textProperty().bind(node.getLastBlock().asString())
 		lblNodeCount.textProperty().bind(node.getNodes().asString())
 	}
-
-	def showTopic(String topicHash, Topic topic) {
+	
+	def showTopic(Hash topicHash, Topic topic) {
 		setNewsContent(new TopicOverview(this, topicHash, topic))
 	}
 
@@ -73,13 +73,13 @@ class MainController {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
 	
-	def newSource(String topicHash, Topic topic) {
+	def newSource(Hash topicHash, Topic topic) {
 		setNewsContent(new NewSource() [ source |
 			try {
 				source.verifyStatic()
 				new Thread[
 					val newSource = facade.postSource(source)
-					facade.refer(topicHash, Hashing.toHexString(node.hash(newSource)))
+					facade.refer(topicHash, node.hash(newSource))
 				].start()
 				pop()
 			} catch(Exception e) {
@@ -127,5 +127,6 @@ class MainController {
 		AnchorPane.setLeftAnchor(node, 0d)
 		return node
 	}
+	
 
 }

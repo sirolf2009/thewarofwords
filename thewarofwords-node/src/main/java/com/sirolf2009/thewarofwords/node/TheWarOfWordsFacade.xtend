@@ -1,7 +1,7 @@
 package com.sirolf2009.thewarofwords.node
 
-import com.sirolf2009.objectchain.common.crypto.Hashing
 import com.sirolf2009.objectchain.common.crypto.Keys
+import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
@@ -10,7 +10,6 @@ import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.common.model.Upvote
 import java.net.InetSocketAddress
 import java.net.URL
-import java.util.List
 
 class TheWarOfWordsFacade {
 	
@@ -32,7 +31,7 @@ class TheWarOfWordsFacade {
 		return state.getSources()
 	}
 	
-	def getSources(String topicHash) {
+	def getSources(Hash topicHash) {
 		return state.getSources(topicHash)
 	}
 	
@@ -52,15 +51,15 @@ class TheWarOfWordsFacade {
 		node.submitMutation(source)
 	}
 	
-	def refer(String topicHash, String sourceHash) {
-		node.submitMutation(new Reference(Hashing.toByteArray(topicHash), Hashing.toByteArray(sourceHash)))
+	def refer(Hash topicHash, Hash sourceHash) {
+		node.submitMutation(new Reference(topicHash, sourceHash))
 	}
 	
 	def upvote(Reference reference) {
 		upvote(reference.source, reference.topic)
 	}
 
-	def upvote(List<Byte> sourceHash, List<Byte> topicHash) {
+	def upvote(Hash sourceHash, Hash topicHash) {
 		node.submitMutation(new Upvote(node.keys.public, sourceHash, topicHash))
 	}
 	

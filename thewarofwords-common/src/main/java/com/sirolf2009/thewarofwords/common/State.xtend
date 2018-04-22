@@ -6,6 +6,7 @@ import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.objectchain.common.interfaces.IState
 import com.sirolf2009.objectchain.common.model.Block
 import com.sirolf2009.objectchain.common.model.BlockHeader
+import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
@@ -24,12 +25,12 @@ import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.Set
+import java.util.TreeSet
 import java.util.concurrent.atomic.AtomicReference
 import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
-import java.util.TreeSet
 
 @Data class State implements IState {
 
@@ -45,7 +46,7 @@ import java.util.TreeSet
 		val topicsQuery = topics.map [ mutation |
 			val it = mutation.object as Topic
 			'''
-			{:topic/hash "«mutation.hash(kryo).toHexString()»"
+			{:topic/hash "«mutation.hash(kryo)»"
 			 :topic/name "«name»"
 			 :topic/description "«description»"
 			 «IF !tags.empty»
@@ -58,7 +59,7 @@ import java.util.TreeSet
 		val sourcesQuery = sources.map [ mutation |
 			val it = mutation.object as Source
 			'''
-			{:source/hash "«mutation.hash(kryo).toHexString()»"
+			{:source/hash "«mutation.hash(kryo)»"
 			 :source/source "«source»"
 			 :source/type "«sourceType»"
 			 :source/comment "«comment»"
@@ -69,31 +70,31 @@ import java.util.TreeSet
 		val referencesQuery = references.map [ mutation |
 			val it = mutation.object as Reference
 			'''
-			{:db/id [:topic/hash "«topic.toHexString()»"]
-			 :topic/refers "«source.toHexString()»"}'''
+			{:db/id [:topic/hash "«topic»"]
+			 :topic/refers "«source»"}'''
 		].toList()
 
 		val upvotes = block.mutations.filter[object instanceof Upvote].toList()
 		val upvotesQuery = upvotes.map [ mutation |
 			val it = mutation.object as Upvote
 			'''
-			{:upvote/hash "«mutation.hash(kryo).toHexString()»"
+			{:upvote/hash "«mutation.hash(kryo)»"
 			 :upvote/voter "«voter.encoded.toHexString()»"
-			 :upvote/source "«sourceHash.toHexString()»"
-			 :upvote/topic "«topicHash.toHexString()»"}'''
+			 :upvote/source "«sourceHash»"
+			 :upvote/topic "«topicHash»"}'''
 		].toList()
 
 		val blockQuery = '''
-			{:block/hash "«block.hash(kryo).toHexString()»"
+			{:block/hash "«block.hash(kryo)»"
 			 :block/number «blockNumber»
-			 :block/previous-block "«block.header.previousBlock.toHexString()»"
-			 :block/merkleroot "«block.header.merkleRoot.toHexString()»"
+			 :block/previous-block "«block.header.previousBlock»"
+			 :block/merkleroot "«block.header.merkleRoot»"
 			 :block/time «block.header.time.time»
 			 :block/target "«block.header.target.toByteArray().toHexString()»"
 			 :block/nonce «block.header.nonce»
-			 «topics.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-topics [", " ", "]", [toString()])»
-			 «sources.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-sources [", " ", "]", [toString()])»
-			 «references.map['''"«hash(kryo).toHexString()»"'''].join(":block/added-references [", " ", "]", [toString()])»}
+			 «topics.map['''"«hash(kryo)»"'''].join(":block/added-topics [", " ", "]", [toString()])»
+			 «sources.map['''"«hash(kryo)»"'''].join(":block/added-sources [", " ", "]", [toString()])»
+			 «references.map['''"«hash(kryo)»"'''].join(":block/added-references [", " ", "]", [toString()])»}
 		'''
 		// TODO prepared statements
 		log.trace("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
@@ -123,11 +124,11 @@ import java.util.TreeSet
 		[:find [?e ...]
 		 :where [?e topic/hash _]]''')
 		response.map[database.entity(it)].map [
-			get(":topic/hash") as String -> new Topic(get(":topic/name") as String, get(":topic/description") as String, get(":topic/tags") as Set<String>)
+			new Hash(get(":topic/hash") as String) -> new Topic(get(":topic/name") as String, get(":topic/description") as String, get(":topic/tags") as Set<String>)
 		].toMap([key], [value])
 	}
 
-	def getBlocknumberForTopic(String topicHash) {
+	def getBlocknumberForTopic(Hash topicHash) {
 		queryVector('''
 		[:find [?b ...]
 		 :where [?block block/added-topics "«topicHash»"]
@@ -135,7 +136,7 @@ import java.util.TreeSet
 		''').get(0)
 	}
 
-	def getBlocknumberForSource(String sourceHash) {
+	def getBlocknumberForSource(Hash sourceHash) {
 		queryVector('''
 		[:find [?b ...]
 		 :where [?block block/added-sources "«sourceHash»"]
@@ -147,24 +148,24 @@ import java.util.TreeSet
 		query('''
 		[:find ?h ?s ?t ?c ?o
 		 :where [?e source/hash ?h]
-		        [?e source/source ?s]
-		 	[?e source/type ?t]
-		 	      [?e source/comment ?c]
-		 	      [?e source/owner ?o]]''').parseSources()
+		 		[?e source/source ?s]
+		 		[?e source/type ?t]
+		 		[?e source/comment ?c]
+		 		[?e source/owner ?o]]''').parseSources()
 	}
 
-	def getSource(String sourceHash) {
+	def getSource(Hash sourceHash) {
 		query('''
 		[:find ?h ?s ?t ?c ?o
 		 :where [?e source/hash "«sourceHash»"]
 		 		[?e source/hash ?h]
-		 		     [?e source/source ?s]
-		 	[?e source/type ?t]
-		 	      [?e source/comment ?c]
-		 	      [?e source/owner ?o]]''').parseSources()
+		 		[?e source/source ?s]
+		 		[?e source/type ?t]
+		 		[?e source/comment ?c]
+		 		[?e source/owner ?o]]''').parseSources()
 	}
 
-	def getSources(String topicHash) {
+	def getSources(Hash topicHash) {
 		query('''
 		[:find ?h ?s ?t ?c ?o
 		 :where [?topic topic/hash "«topicHash»"]
@@ -178,7 +179,7 @@ import java.util.TreeSet
 	}
 
 	def private parseSources(HashSet<PersistentVector> response) {
-		val responseById = response.groupBy[get(0) as String]
+		val responseById = response.groupBy[new Hash(get(0) as String)]
 		responseById.mapValues [
 			val source = new URL(get(0).get(1) as String)
 			val type = SourceType.valueOf(get(0).get(2) as String)
@@ -206,7 +207,7 @@ import java.util.TreeSet
 		val sources = entity.get(":block/added-sources") as Set<String>
 		val topics = entity.get(":block/added-topics") as Set<String>
 		
-		val header = new BlockHeader(previousBlock.toByteArray(), merkleroot.toByteArray(), new Date(time), new BigInteger(target.toByteArray()), nonce.intValue())
+		val header = new BlockHeader(new Hash(previousBlock), new Hash(merkleroot), new Date(time), new BigInteger(target.toByteArray()), nonce.intValue())
 		return new Block(header, new TreeSet(#[sources.map[parseSource], topics.map[parseTopic]]))
 	}
 	

@@ -9,10 +9,11 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import com.sirolf2009.objectchain.common.model.Hash
 
 class TopicOverview extends MigPane {
 
-	new(MainController controller, String topicHash, Topic topic) {
+	new(MainController controller, Hash topicHash, Topic topic) {
 		super("fillx")
 		styleClass += #["newsContentItem", "topicOverview"]
 		add(new Label(topic.getName()) => [
@@ -28,7 +29,7 @@ class TopicOverview extends MigPane {
 		add(new FlowPane() => [
 			controller.getFacade().getSources(topicHash).forEach [ hash, sourceAndKey |
 				if(sourceAndKey.getValue().getSourceType() == SourceType.CITATION) {
-					getChildren().add(new CitationCard(sourceAndKey.getValue()) => [
+					getChildren().add(new CitationCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
 						FlowPane.setMargin(it, new Insets(4))
 					])
 				} else {

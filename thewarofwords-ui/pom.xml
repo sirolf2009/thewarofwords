@@ -46,17 +46,26 @@
 				</configuration>
 			</plugin>
 
-            <plugin>
-                <groupId>org.eclipse.xtend</groupId>
-                <artifactId>xtend-maven-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <javaSourceVersion>1.8</javaSourceVersion>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.eclipse.xtend</groupId>
+				<artifactId>xtend-maven-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<javaSourceVersion>1.8</javaSourceVersion>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>4thline-repo</id>
+			<url>http://4thline.org/m2</url>
+			<snapshots>
+				<enabled>false</enabled> <!-- Or true, if you like to use unreleased code -->
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -64,7 +73,7 @@
 			<artifactId>thewarofwords-node</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.miglayout</groupId>
 			<artifactId>miglayout-javafx</artifactId>
@@ -81,6 +90,12 @@
 			<groupId>com.miglayout</groupId>
 			<artifactId>miglayout-javafx</artifactId>
 			<version>5.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fourthline.cling</groupId>
+			<artifactId>cling-support</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 	</dependencies>
 

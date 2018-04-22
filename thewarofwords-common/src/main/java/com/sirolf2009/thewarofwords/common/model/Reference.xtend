@@ -2,31 +2,29 @@ package com.sirolf2009.thewarofwords.common.model
 
 import com.esotericsoftware.kryo.Kryo
 import com.sirolf2009.objectchain.common.exception.VerificationException
+import com.sirolf2009.objectchain.common.interfaces.IHashable
 import com.sirolf2009.objectchain.common.model.Block
-import java.util.List
+import com.sirolf2009.objectchain.common.model.Hash
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.xbase.lib.util.ToStringBuilder
 
-import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
-import com.sirolf2009.objectchain.common.interfaces.IHashable
-
 @Data class Reference implements IVerifiable, IHashable {
 
-	val List<Byte> topic
-	val List<Byte> source
+	val Hash topic
+	val Hash source
 
 	override toString() {
 		val b = new ToStringBuilder(this)
-		b.add("topic", this.topic.toHexString())
-		b.add("source", this.source.toHexString())
+		b.add("topic", topic)
+		b.add("source", source)
 		return b.toString()
 	}
 	
 	override verifyStatic() throws VerificationException {
-		if(topic.isEmpty()) {
+		if(topic.getBytes().isEmpty()) {
 			throw new VerificationException("topic is empty")
 		}
-		if(source.isEmpty()) {
+		if(source.getBytes().isEmpty()) {
 			throw new VerificationException("source is empty")
 		}
 	}

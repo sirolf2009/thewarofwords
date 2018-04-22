@@ -16,7 +16,6 @@ import org.junit.Test
 import static java.lang.Thread.sleep
 import static junit.framework.Assert.*
 
-import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 import static extension com.sirolf2009.thewarofwords.tests.Util.*
 
 class TestTopicSourceRefer {
@@ -75,7 +74,7 @@ class TestTopicSourceRefer {
 		node2.awaitNewBlock()
 		
 		node2.getLastState() => [
-			val sources = getSources(node2.get().hash(specificProject).toHexString())
+			val sources = getSources(node2.get().hash(specificProject))
 			assertEquals("There is only 1 source in "+sources, 1, sources.size())
 			assertEquals("https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
 		]
