@@ -1,17 +1,30 @@
 package com.sirolf2009.thewarofwords.ui.component
 
+import com.sirolf2009.objectchain.common.model.Hash
+import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.ui.MainController
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.collections.FXCollections
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.FlowPane
+import javafx.scene.layout.HBox
 import org.tbee.javafx.scene.layout.MigPane
-import com.sirolf2009.thewarofwords.common.model.SourceType
-import javafx.geometry.Insets
-import javafx.geometry.Pos
-import com.sirolf2009.objectchain.common.model.Hash
+import javafx.scene.layout.VBox
+import java.util.LinkedList
+import java.util.ArrayList
+import javafx.scene.Node
 
 class TopicOverview extends MigPane {
+
+	val sources = FXCollections.<Node>observableArrayList()
+	val columnCount = new SimpleIntegerProperty()
+	val HBox sourcesContainer = new HBox(8) => [
+		alignment = Pos.CENTER
+	]
 
 	new(MainController controller, Hash topicHash, Topic topic) {
 		super("fillx")
@@ -26,19 +39,48 @@ class TopicOverview extends MigPane {
 		add(new Button("Add source") => [
 			onAction = [controller.newSource(topicHash, topic)]
 		], "wrap, right")
-		add(new FlowPane() => [
-			controller.getFacade().getSources(topicHash).forEach [ hash, sourceAndKey |
-				if(sourceAndKey.getValue().getSourceType() == SourceType.CITATION) {
-					getChildren().add(new CitationCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
-						FlowPane.setMargin(it, new Insets(4))
-					])
-				} else {
-					getChildren().add(new ArticleCard(sourceAndKey.getValue()) => [
-						FlowPane.setMargin(it, new Insets(4))
-					])
-				}
-			]
-		], "span, grow")
+		add(sourcesContainer, "span, grow")
+
+		controller.getFacade().getSources(topicHash).forEach [ hash, sourceAndKey |
+			if(sourceAndKey.getValue().getSourceType() == SourceType.CITATION) {
+				sources.add(new CitationCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
+					FlowPane.setMargin(it, new Insets(4))
+				])
+			} else {
+				sources.add(new ArticleCard(sourceAndKey.getValue()) => [
+					FlowPane.setMargin(it, new Insets(4))
+				])
+			}
+		]
+
+		val prefWidth = 200
+		widthProperty().addListener [
+			val columnCount = Math.max(1, Math.floor(getWidth() / prefWidth)) as int
+			if(columnCount != this.columnCount.get()) {
+				this.columnCount.set(columnCount)
+			}
+		]
+		columnCount.addListener[
+			layoutSources
+		]
+	}
+	
+	def layoutSources() {
+		sourcesContainer.getChildren().clear()
+		val columns = new ArrayList()
+		(0 ..< columnCount.get()).forEach[
+			val column = new VBox()
+			sourcesContainer.getChildren().add(column)
+			columns.add(column)
+		]
+		val queue = new LinkedList(columns)
+		sources.forEach[
+			if(queue.isEmpty()) {
+				queue.addAll(columns)
+			}
+			val column = queue.pop() 
+			column.getChildren().add(it)
+		]
 	}
 
 }
