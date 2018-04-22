@@ -20,25 +20,29 @@ import javafx.fxml.FXML
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.Tab
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.StackPane
 import org.apache.logging.log4j.LogManager
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.dooapp.fxform.FXForm
 
 class MainController {
 
 	static val log = LogManager.logger
+	val settings = new Settings()
 	@Accessors var UINode node
 	@Accessors var TheWarOfWordsFacade facade
 	@FXML var Button popButton
 	@FXML var StackPane newsContent
+	@FXML var Tab settingsTab
 	@FXML var Label lblIsConnected
 	@FXML var Label lblLastBlock
 	@FXML var Label lblNodeCount
 
 	@FXML
 	def void initialize() {
-		node = new UINode(#[new InetSocketAddress("thewarofwords.com", 2012)], 4567, getKeys())
+		node = new UINode(settings, #[new InetSocketAddress("thewarofwords.com", 2012)], 4567, getKeys())
 		facade = new TheWarOfWordsFacade(node)
 		new Thread[node.start()] => [
 			daemon = true
@@ -51,6 +55,11 @@ class MainController {
 					loadTopics()
 				]
 			}
+		]
+		
+		settingsTab.setContent(new FXForm(settings))
+		settings.useUpnp.addListener[
+			println(settings.useUpnp.get())
 		]
 		
 		popButton.disableProperty().bind(Bindings.lessThan(Bindings.size(newsContent.getChildren()), 2))
@@ -67,7 +76,6 @@ class MainController {
 	def showSource(String sourceHash, Source source) {
 		// TODO
 	}
-
 
 	def loadTopics() {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))

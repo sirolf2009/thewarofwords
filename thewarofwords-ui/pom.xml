@@ -97,6 +97,12 @@
 			<artifactId>cling-support</artifactId>
 			<version>2.1.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.dooapp.fxform2</groupId>
+			<artifactId>core</artifactId>
+			<version>8.2.4</version> <!-- Note: For JavaFX 2.2, use 2.2.6 -->
+		</dependency>
 	</dependencies>
 
 </project>

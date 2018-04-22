@@ -46,8 +46,12 @@ class TopicOverview extends MigPane {
 				sources.add(new CitationCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
+			} else if(sourceAndKey.getValue().getSourceType() == SourceType.TWEET) {
+				sources.add(new TweetCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
+					FlowPane.setMargin(it, new Insets(4))
+				])
 			} else {
-				sources.add(new ArticleCard(sourceAndKey.getValue()) => [
+				sources.add(new ArticleCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
 			}

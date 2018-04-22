@@ -1,7 +1,9 @@
 package com.sirolf2009.thewarofwords.ui.component
 
+import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
+import com.sirolf2009.thewarofwords.ui.MainController
 import com.sirolf2009.thewarofwords.ui.thumbnail.Thumbnails
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -9,9 +11,10 @@ import javafx.scene.image.ImageView
 import javafx.scene.text.TextAlignment
 import org.tbee.javafx.scene.layout.MigPane
 
-class ArticleCard extends Card {
+class ArticleCard extends SourceCard {
 
-	new(Source source) {
+	new(MainController controller, Hash topicHash, Hash sourceHash, Source source) {
+		super(controller, topicHash, sourceHash, source)
 		if(source.getSourceType() != SourceType.ARTICLE) {
 			throw new IllegalArgumentException('''«source» is not an article''')
 		}

@@ -29,6 +29,7 @@
 	-fx-font-size: 4em;
 	-fx-background-color: #0b3954;
 	-fx-text-fill: #ff6663;
+	-fx-padding: 16;
 }
 .topicOverview > .description {
 	-fx-font-size: 0.9em;
@@ -40,12 +41,10 @@
 	-fx-border-width: 1;
 	-fx-effect: dropshadow(three-pass-box, #0d1321, 10, 0, 4, 4);
 }
-
 .card .card-body {
 	-fx-background-insets: 1;
 	-fx-background-color: white;
 }
-
 .card .card-header {
 	-fx-padding: 4 4 0 4;
 }
@@ -62,4 +61,13 @@
 
 .citation {
 	-fx-font-size: 1.4em;
+}
+
+.tweet-card .handle {
+	-fx-font-size: 0.9em;
+	-fx-text-fill: rgb(120.0, 120.0, 120.0)
+}
+.tweet-card .name {
+	-fx-font-size: 1.1em;
+	-fx-font-weight: bold;
 }

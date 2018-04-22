@@ -9,13 +9,20 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
+import javafx.scene.Node
+import javafx.scene.web.WebView
 
 class SourceCard extends Card {
 
 	static val emptyImage = new Image("images/heart-empty-16.png")
 	static val filledImage = new Image("images/heart-filled-16.png")
+	
+	val MainController controller
+	val Source source
 
 	new(MainController controller, Hash topicHash, Hash sourceHash, Source source) {
+		this.controller = controller
+		this.source = source
 		setHeader(new HBox() => [ container |
 			container.alignment = Pos.TOP_RIGHT
 			container.getChildren().add(new Pane() => [
@@ -35,6 +42,16 @@ class SourceCard extends Card {
 				}
 			])
 		])
+	}
+	
+	override setContent(Node node) {
+		super.setContent(node)
+		node.onMouseClicked = [
+			val browser = new WebView()
+			val webEngine = browser.getEngine()
+			webEngine.load(source.getSource().toExternalForm())
+			controller.setNewsContent(browser)
+		]
 	}
 
 }

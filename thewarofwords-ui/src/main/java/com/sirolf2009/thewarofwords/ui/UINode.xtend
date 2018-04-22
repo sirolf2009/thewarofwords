@@ -38,14 +38,23 @@ import org.fourthline.cling.support.model.PortMapping
 	val ObjectProperty<Hash> lastBlock
 	val IntegerProperty nodes
 
-	new(List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
+	new(Settings settings, List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
 		super(trackers, nodePort, keys)
 		isConnected = new SimpleBooleanProperty(false)
 		isSynchronised = new SimpleBooleanProperty(false)
 		lastBlock = new SimpleObjectProperty()
 		nodes = new SimpleIntegerProperty(0)
 
-		upnpPort(nodePort)
+		if(settings.useUpnp.get()) {
+			upnpPort(nodePort)
+		}
+		settings.useUpnp.addListener[obs,oldVal,newVal|
+			if(newVal) {
+				upnpPort(nodePort)
+			} else {
+				upnpServices.forEach[shutdown()]
+			}
+		]
 	}
 
 	override synchronized onNewConnection(Kryo kryo, Connection connection) {
@@ -82,9 +91,9 @@ import org.fourthline.cling.support.model.PortMapping
 			val addrItr = interface.inetAddresses
 			while(addrItr.hasMoreElements()) {
 				val address = addrItr.nextElement().toString()
-				if(address.startsWith("192.168")) {
+				if(address.startsWith("192.168") || address.startsWith("192.178.")  || address.startsWith("10.")) {
 					upnpPort(address, port)
-				} else if(address.startsWith("/192.168")) {
+				} else if(address.startsWith("/192.168") || address.startsWith("/192.178.")  || address.startsWith("/10.")) {
 					upnpPort(address.substring(1), port)
 				}
 			}
