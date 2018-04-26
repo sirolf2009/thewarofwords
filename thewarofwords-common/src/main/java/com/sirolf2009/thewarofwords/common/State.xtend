@@ -2,7 +2,6 @@ package com.sirolf2009.thewarofwords.common
 
 import clojure.lang.PersistentVector
 import com.esotericsoftware.kryo.Kryo
-import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.objectchain.common.interfaces.IState
 import com.sirolf2009.objectchain.common.model.Block
 import com.sirolf2009.objectchain.common.model.BlockHeader
@@ -31,6 +30,7 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 
 @Data class State implements IState {
 
@@ -103,6 +103,10 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 		return new State(connection, connection.db, blockNumber + 1)
 	}
+	
+	override toString() {
+		'''State for block «blockNumber»'''
+	}
 
 	def private execute(Iterable<String> queries) {
 		val query = queries.join("[", "\n", "]", [toString()])
@@ -123,8 +127,8 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		val response = queryVector('''
 		[:find [?e ...]
 		 :where [?e topic/hash _]]''')
-		response.map[database.entity(it)].map [
-			new Hash(get(":topic/hash") as String) -> new Topic(get(":topic/name") as String, get(":topic/description") as String, get(":topic/tags") as Set<String>)
+		response.map [
+			new Hash(database.entity(it).get(":topic/hash") as String) -> parseTopic(it)
 		].toMap([key], [value])
 	}
 
@@ -154,48 +158,23 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	}
 
 	def getSources() {
-		query('''
-		[:find ?h ?s ?t ?c ?o
-		 :where [?e source/hash ?h]
-		 		[?e source/source ?s]
-		 		[?e source/type ?t]
-		 		[?e source/comment ?c]
-		 		[?e source/owner ?o]]''').parseSources()
+		queryVector('''
+		[:find [?e ...]
+		 :where [?e source/hash _]]''').toMap([parseSourceHash()], [parseSourceOwner() -> parseSource()])
 	}
 
 	def getSource(Hash sourceHash) {
-		query('''
-		[:find ?h ?s ?t ?c ?o
-		 :where [?e source/hash "«sourceHash»"]
-		 		[?e source/hash ?h]
-		 		[?e source/source ?s]
-		 		[?e source/type ?t]
-		 		[?e source/comment ?c]
-		 		[?e source/owner ?o]]''').parseSources()
+		queryVector('''
+		[:find [?e ...]
+		 :where [?e source/hash "«sourceHash»"]]''').map[parseSource()]
 	}
 
 	def getSources(Hash topicHash) {
-		query('''
-		[:find ?h ?s ?t ?c ?o
+		queryVector('''
+		[:find [?e ...]
 		 :where [?topic topic/hash "«topicHash»"]
 		        [?topic topic/refers ?reference]
-		        [?source source/hash ?reference]
-		        [?source source/hash ?h]
-		        [?source source/source ?s]
-		        [?source source/type ?t]
-		        [?source source/comment ?c]
-		        [?source source/owner ?o]]''').parseSources()
-	}
-
-	def private parseSources(HashSet<PersistentVector> response) {
-		val responseById = response.groupBy[new Hash(get(0) as String)]
-		responseById.mapValues [
-			val source = new URL(get(0).get(1) as String)
-			val type = SourceType.valueOf(get(0).get(2) as String)
-			val comment = get(0).get(3) as String
-			val owner = CryptoHelper.publicKey((get(0).get(4) as String).toByteArray)
-			return owner -> new Source(type, source, comment)
-		]
+		        [?e source/hash ?reference]]''').toMap([parseSourceHash()], [parseSourceOwner() -> parseSource()])
 	}
 
 	def getUpvotes(PublicKey key) {
@@ -206,7 +185,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		 		[?upvote upvote/source ?source-hash]]''')
 	}
 	
-	def parseBlock(Object blockID) {
+	def protected parseBlock(Object blockID) {
 		val entity = database.entity(blockID)
 		val previousBlock = entity.get(":block/previous-block") as String
 		val merkleroot = entity.get(":block/merkleroot") as String
@@ -220,7 +199,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		return new Block(header, new TreeSet(#[sources.map[parseSource], topics.map[parseTopic]]))
 	}
 	
-	def parseTopic(Object blockID) {
+	def protected parseTopic(Object blockID) {
 		val entity = database.entity(blockID)
 		val name = entity.get(":topic/name") as String
 		val description = entity.get(":topic/description") as String
@@ -228,8 +207,18 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		return new Topic(name, description, tags)
 	}
 	
-	def parseSource(Object blockID) {
-		val entity = database.entity(blockID)
+	def protected parseSourceHash(Object sourceHash) {
+		val entity = database.entity(sourceHash)
+		return new Hash(entity.get(":source/hash") as String)
+	}
+	
+	def protected parseSourceOwner(Object sourceHash) {
+		val entity = database.entity(sourceHash)
+		return CryptoHelper.publicKey((entity.get(":source/owner") as String).toByteArray)
+	}
+	
+	def protected parseSource(Object sourceHash) {
+		val entity = database.entity(sourceHash)
 		val source = entity.get(":source/source") as String
 		val comment = entity.get(":source/comment") as String
 		val type = entity.get(":source/type") as String

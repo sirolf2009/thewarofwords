@@ -7,16 +7,18 @@ import com.sirolf2009.thewarofwords.node.TheWarOfWordsTracker
 import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicReference
 import com.sirolf2009.thewarofwords.common.State
+import com.sirolf2009.objectchain.common.model.Block
 
 class Util {
 	
-	def static awaitNewBlock(AtomicReference<TheWarOfWordsNode> node) {
+	def static Block awaitNewBlock(AtomicReference<TheWarOfWordsNode> node) {
 		val currentBlock = node.getLastBlock()
 		var int attempt = 0
 		while(true) {
 			Thread.sleep(1000)
-			if(node.getLastBlock() != currentBlock) {
-				return
+			val lastBlock = node.getLastBlock()
+			if(lastBlock != currentBlock) {
+				return lastBlock
 			} else {
 				attempt += 1
 				if(attempt == 10) {

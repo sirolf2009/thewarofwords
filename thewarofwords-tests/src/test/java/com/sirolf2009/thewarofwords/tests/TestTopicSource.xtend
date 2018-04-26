@@ -1,6 +1,5 @@
 package com.sirolf2009.thewarofwords.tests
 
-import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
@@ -18,7 +17,7 @@ import static junit.framework.Assert.*
 
 import static extension com.sirolf2009.thewarofwords.tests.Util.*
 
-class TestTopicSourceRefer {
+class TestTopicSource {
 
 	val AtomicReference<TheWarOfWordsTracker> tracker = new AtomicReference()
 	val AtomicReference<TheWarOfWordsNode> node1 = new AtomicReference()
@@ -38,24 +37,25 @@ class TestTopicSourceRefer {
 	}
 
 	@Test
-	def void testTopicSourceRefer() {
-		val genericProject = node1.submitMutation(new Topic("Generic Projects", "description", #["generic", "projects"].toSet()))
-		val genericSource = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/objectchain"), "This allows you to do a lot!"))
-		node1.submitMutation(new Reference(node1.get().hash(genericProject), node1.get().hash(genericSource)))
-		
-		val specificProject = node1.submitMutation(new Topic("Practical Projects", "description", #["practical", "projects"].toSet()))
-		val specificSource = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "This allows you to do one thing very easily!"))
+	def void testTopicSource() {
+		node1.submitMutation(new Topic("Test Topic", "description", #["test", "topic"].toSet()))
+		node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "All you're base are belong to us"))
 		
 		node2.awaitNewBlock()
-		
-		node1.submitMutation(new Reference(node1.get().hash(specificProject), node1.get().hash(specificSource)))
-		
-		node2.awaitNewBlock()
-		
+
 		node2.getLastState() => [
-			val sources = getSources(node2.get().hash(specificProject))
-			assertEquals("There is only 1 source in "+sources, 1, sources.size())
-			assertEquals("https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
+			assertEquals(topics.toString(), 1, topics.size())
+			assertEquals(topics.toString(), "Test Topic", topics.values.get(0).name)
+			assertEquals(topics.toString(), "description", topics.values.get(0).description)
+			val tags = topics.values.get(0).tags
+			assertEquals(tags.toString(), 2, tags.size())
+			assertTrue(tags.toString(), tags.contains("test"))
+			assertTrue(tags.toString(), tags.contains("topic"))
+
+			assertEquals(sources.toString(), 1, sources.size())
+			assertEquals(sources.toString(), SourceType.ARTICLE, sources.values.get(0).value.sourceType)
+			assertEquals(sources.toString(), "https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
+			assertEquals(sources.toString(), "All you're base are belong to us", sources.values.get(0).value.comment)
 		]
 	}
 	
