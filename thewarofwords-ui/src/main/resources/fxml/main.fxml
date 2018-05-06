@@ -13,65 +13,71 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Pane?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sirolf2009.thewarofwords.ui.MainController">
-   <children>
-      <TabPane prefHeight="400.0" prefWidth="600.0" side="LEFT" styleClass="main-tab" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
-        <tabs>
-          <Tab closable="false" text="News">
-               <content>
-                  <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
-                     <content>
-                        <VBox>
-                           <children>
-                              <ToolBar>
-                                <items>
-                                    <Button fx:id="popButton" mnemonicParsing="false" onAction="#pop" text="&lt;" />
-                                    <Button mnemonicParsing="false" onAction="#loadTopics" text="Load Topics" />
-                                  <Button mnemonicParsing="false" onAction="#newTopic" text="New Topic" />
-                                </items>
-                              </ToolBar>
-                              <StackPane fx:id="newsContent" prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                           </children>
-                        </VBox>
-                     </content>
-                  </ScrollPane>
-               </content>
-          </Tab>
-          <Tab closable="false" text="Profile">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </Tab>
-          <Tab closable="false" text="Settings" fx:id="settingsTab">
-          </Tab>
-          <Tab closable="false" text="Network">
-               <content>
-                  <GridPane styleClass="network-grid">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Connected" />
-                        <Label fx:id="lblIsConnected" text="Label" GridPane.columnIndex="1" />
-                        <Label text="Last Block" GridPane.rowIndex="1" />
-                        <Label fx:id="lblLastBlock" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label text="# Nodes" GridPane.rowIndex="2" />
-                        <Label fx:id="lblNodeCount" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label text="My Credibility" GridPane.rowIndex="3" />
-                        <Label fx:id="lblCredibility" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                     </children>
-                  </GridPane>
-               </content>
-          </Tab>
-        </tabs>
-      </TabPane>
-   </children>
-</HBox>
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sirolf2009.thewarofwords.ui.MainController">
+	<children>
+		<TabPane prefHeight="400.0" prefWidth="600.0" side="LEFT" styleClass="main-tab" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
+			<tabs>
+				<Tab closable="false" text="News">
+					<content>
+						<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+							<content>
+								<VBox>
+									<children>
+										<ToolBar>
+											<items>
+												<Button fx:id="popButton" mnemonicParsing="false" onAction="#pop" text="&lt;" />
+												<Button mnemonicParsing="false" onAction="#loadTopics" text="Load Topics" />
+												<Button mnemonicParsing="false" onAction="#newTopic" text="New Topic" />
+											</items>
+										</ToolBar>
+										<StackPane fx:id="newsContent" prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+									</children>
+								</VBox>
+							</content>
+						</ScrollPane>
+					</content>
+				</Tab>
+				<Tab closable="false" text="Profile">
+					<content>
+						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+					</content>
+				</Tab>
+				<Tab closable="false" text="Settings" fx:id="settingsTab">
+				</Tab>
+				<Tab closable="false" text="Network">
+					<content>
+						<GridPane styleClass="network-grid">
+							<columnConstraints>
+								<ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="100.0" />
+								<ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+								<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+								<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+								<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+							</rowConstraints>
+							<children>
+								<Label text="Connected" />
+								<Label fx:id="lblIsConnected" text="Label" GridPane.columnIndex="1" />
+								<Label text="Last Block" GridPane.rowIndex="1" />
+								<Label fx:id="lblLastBlock" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+								<Label text="# Nodes" GridPane.rowIndex="2" />
+								<Label fx:id="lblNodeCount" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+								<Label text="My Credibility" GridPane.rowIndex="3" />
+								<Label fx:id="lblCredibility" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+							</children>
+						</GridPane>
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+		<Pane>
+			<children>
+				<Label styleClass="app-title" text="the war of words" alignment="TOP_LEFT"></Label>
+			</children>
+		</Pane>
+	</children>
+</StackPane>

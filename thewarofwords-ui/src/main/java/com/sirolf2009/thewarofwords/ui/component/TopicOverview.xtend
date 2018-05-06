@@ -41,7 +41,7 @@ class TopicOverview extends MigPane {
 		], "wrap, right")
 		add(sourcesContainer, "span, grow")
 
-		controller.getFacade().getSources(topicHash).forEach [ source |
+		controller.getFacade().getSources(topicHash).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [ source |
 			if(source.getSource().getSourceType() == SourceType.CITATION) {
 				sources.add(new CitationCard(controller, topicHash, source) => [
 					FlowPane.setMargin(it, new Insets(4))

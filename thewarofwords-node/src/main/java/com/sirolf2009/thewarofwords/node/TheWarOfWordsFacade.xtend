@@ -10,6 +10,7 @@ import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.common.model.Upvote
 import java.net.InetSocketAddress
 import java.net.URL
+import com.sirolf2009.thewarofwords.common.model.SavedSource
 
 class TheWarOfWordsFacade {
 	
@@ -65,6 +66,14 @@ class TheWarOfWordsFacade {
 
 	def upvote(Hash sourceHash, Hash topicHash) {
 		node.submitMutation(new Upvote(node.keys.public, sourceHash, topicHash))
+	}
+	
+	def getUpvoteCount(Hash sourceHash) {
+		return state.getUpvotes(sourceHash).size()
+	}
+	
+	def getCredit(SavedSource source) {
+		return state.getCredit(source)
 	}
 	
 	def private getState() {

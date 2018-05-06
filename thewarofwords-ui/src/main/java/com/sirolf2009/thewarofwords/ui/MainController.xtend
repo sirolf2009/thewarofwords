@@ -65,9 +65,6 @@ class MainController {
 		]
 		
 		settingsTab.setContent(new FXForm(settings))
-		settings.useUpnp.addListener[
-			println(settings.useUpnp.get())
-		]
 		
 		popButton.disableProperty().bind(Bindings.lessThan(Bindings.size(newsContent.getChildren()), 2))
 

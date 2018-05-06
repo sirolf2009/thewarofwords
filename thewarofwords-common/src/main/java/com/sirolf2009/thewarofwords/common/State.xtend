@@ -33,6 +33,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.thewarofwords.common.model.Account
 import com.sirolf2009.thewarofwords.common.model.SavedSource
+import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 
 @Data class State implements IState {
 
@@ -111,17 +112,7 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 			val vector = queryVector(query, connection.db)
 			val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
 			val source = sourceOpt.get()
-			val credit = switch (source.getSource().getSourceType()) {
-				case CROSS_REFERENCE: 100
-				case CITATION: 100
-				case VIDEO: 80
-				case DEBATE: 80
-				case ARTICLE: 50
-				case VERIFIED_TWEET: 40
-				case BLOG: 30
-				case TWEET: 20
-				case RUMOUR: 1
-			} * getAccount(upvote.getVoter()).map[1 + credibility / 100].orElse(1d)
+			val credit = getCredit(new SavedUpvote(upvote.hash(kryo), upvote))
 			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
 			return '''
 			{:account/key "«account.getKey().encoded.toHexString()»"
@@ -131,6 +122,32 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 		log.trace("new credits: {}", execute(creditsQuery))
 
 		return new State(connection, connection.db, blockNumber + 1)
+	}
+	
+	def getCredit(SavedSource source) {
+		getUpvotes(source.getHash()).map[getCredit()].reduce[a,b|a+b]
+	}
+
+	def getCredit(SavedUpvote upvote) {
+		val query = '''
+		[:find [?e ...]
+		 :where [?e source/hash "«upvote.getUpvote().getSourceHash()»"]
+		 		[?upvote upvote/source "«upvote.getUpvote().getSourceHash()»"]
+		 		[?upvote upvote/hash "«upvote.getHash()»"]]'''
+		val vector = queryVector(query, connection.db)
+		val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
+		val source = sourceOpt.orElseThrow[new RuntimeException("Could not find source accompanying "+upvote)]
+		return switch (source.getSource().getSourceType()) {
+			case CROSS_REFERENCE: 100
+			case CITATION: 100
+			case VIDEO: 80
+			case DEBATE: 80
+			case ARTICLE: 50
+			case VERIFIED_TWEET: 40
+			case BLOG: 30
+			case TWEET: 20
+			case RUMOUR: 1
+		} * getAccount(upvote.getUpvote().getVoter()).map[1 + credibility / 100].orElse(1d)
 	}
 
 	override toString() {
@@ -217,7 +234,23 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 		[:find [?upvote ...]
 		 :where [?source source/owner "«key.encoded.toHexString()»"]
 		 		[?source source/hash ?source-hash]
-		 		[?upvote upvote/source ?source-hash]]''')
+		 		[?upvote upvote/source ?source-hash]]''').map[parseUpvote()]
+	}
+
+	def getUpvotes(Hash sourceHash) {
+		queryVector('''
+		[:find [?upvote ...]
+		 :where [?upvote upvote/source "«sourceHash»"]]''').map[parseUpvote()]
+	}
+
+	def getUpvote(Hash upvoteHash) {
+		getUpvote(upvoteHash, database)
+	}
+
+	def getUpvote(Hash upvoteHash, Database database) {
+		queryVector('''
+		[:find [?upvote ...]
+		 :where [?upvote upvote/hash "«upvoteHash»"]]''').stream().map[parseUpvote(database)].findFirst()
 	}
 
 	def protected parseAccount(Object blockID) {
@@ -250,6 +283,19 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 		return new Topic(name, description, tags)
 	}
 
+	def protected parseUpvote(Object blockID) {
+		return parseUpvote(blockID, database)
+	}
+
+	def protected parseUpvote(Object blockID, Database database) {
+		val entity = database.entity(blockID)
+		val hash = new Hash(entity.get(":upvote/hash") as String)
+		val voter = CryptoHelper.publicKey((entity.get(":upvote/voter") as String).toByteArray())
+		val source = new Hash(entity.get(":topic/source") as String)
+		val topic = new Hash(entity.get(":topic/topic") as String)
+		return new SavedUpvote(hash, new Upvote(voter, source, topic))
+	}
+
 	def protected parseSource(Object sourceHash) {
 		return parseSource(sourceHash, database)
 	}
@@ -257,7 +303,7 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 	def protected parseSource(Object sourceHash, Database database) {
 		val entity = database.entity(sourceHash)
 		val hash = new Hash(entity.get(":source/hash") as String)
-		val owner = CryptoHelper.publicKey((entity.get(":source/owner") as String).toByteArray)
+		val owner = CryptoHelper.publicKey((entity.get(":source/owner") as String).toByteArray())
 		val source = entity.get(":source/source") as String
 		val comment = entity.get(":source/comment") as String
 		val type = entity.get(":source/type") as String
