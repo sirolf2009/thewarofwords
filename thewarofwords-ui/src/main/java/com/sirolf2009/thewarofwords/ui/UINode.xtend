@@ -27,6 +27,9 @@ import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.protocol.RetrieveRemoteDescriptors
 import org.fourthline.cling.support.igd.PortMappingListener
 import org.fourthline.cling.support.model.PortMapping
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
+import com.sirolf2009.thewarofwords.common.State
 
 @Accessors class UINode extends TheWarOfWordsNode {
 
@@ -37,6 +40,7 @@ import org.fourthline.cling.support.model.PortMapping
 	val BooleanProperty isSynchronised
 	val ObjectProperty<Hash> lastBlock
 	val IntegerProperty nodes
+	val DoubleProperty credibility
 
 	new(Settings settings, List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
 		super(trackers, nodePort, keys)
@@ -44,6 +48,7 @@ import org.fourthline.cling.support.model.PortMapping
 		isSynchronised = new SimpleBooleanProperty(false)
 		lastBlock = new SimpleObjectProperty()
 		nodes = new SimpleIntegerProperty(0)
+		credibility = new SimpleDoubleProperty(0)
 
 		if(settings.useUpnp.get()) {
 			upnpPort(nodePort)
@@ -77,6 +82,7 @@ import org.fourthline.cling.support.model.PortMapping
 	override onBlockchainExpanded() {
 		Platform.runLater [
 			lastBlock.set(hash(blockchain.mainBranch.getLastBlock()))
+			credibility.set((blockchain.mainBranch.getLastState() as State).getAccount(getKeys().public).map[it.getCredibility()].orElse(0d))
 		]
 	}
 

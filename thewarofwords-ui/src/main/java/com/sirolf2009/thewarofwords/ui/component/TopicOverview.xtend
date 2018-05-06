@@ -41,23 +41,23 @@ class TopicOverview extends MigPane {
 		], "wrap, right")
 		add(sourcesContainer, "span, grow")
 
-		controller.getFacade().getSources(topicHash).forEach [ hash, sourceAndKey |
-			if(sourceAndKey.getValue().getSourceType() == SourceType.CITATION) {
-				sources.add(new CitationCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
+		controller.getFacade().getSources(topicHash).forEach [ source |
+			if(source.getSource().getSourceType() == SourceType.CITATION) {
+				sources.add(new CitationCard(controller, topicHash, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
-			} else if(sourceAndKey.getValue().getSourceType() == SourceType.TWEET) {
-				sources.add(new TweetCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
+			} else if(source.getSource().getSourceType() == SourceType.TWEET) {
+				sources.add(new TweetCard(controller, topicHash, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
 			} else {
-				sources.add(new ArticleCard(controller, topicHash, hash, sourceAndKey.getValue()) => [
+				sources.add(new ArticleCard(controller, topicHash, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
 			}
 		]
 
-		val prefWidth = 200
+		val prefWidth = 400
 		widthProperty().addListener [
 			val columnCount = Math.max(1, Math.floor(getWidth() / prefWidth)) as int
 			if(columnCount != this.columnCount.get()) {

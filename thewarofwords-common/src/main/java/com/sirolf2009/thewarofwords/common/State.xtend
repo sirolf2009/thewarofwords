@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.thewarofwords.common.model.Account
+import com.sirolf2009.thewarofwords.common.model.SavedSource
 
 @Data class State implements IState {
 
@@ -97,11 +98,20 @@ import com.sirolf2009.thewarofwords.common.model.Account
 			 «sources.map['''"«hash(kryo)»"'''].join(":block/added-sources [", " ", "]", [toString()])»
 			 «references.map['''"«hash(kryo)»"'''].join(":block/added-references [", " ", "]", [toString()])»}
 		'''
+		// TODO prepared statements
+		log.trace("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
+		log.trace("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
+		log.trace("new block: {}", execute(#[blockQuery]))
 
 		val creditsQuery = upvotes.map [ mutation |
 			val upvote = mutation.object as Upvote
-			val source = getSource(upvote.sourceHash).get()
-			val credit = switch (source.getValue().getSourceType()) {
+			val query = '''
+			[:find [?e ...]
+			 :where [?e :source/hash "«upvote.sourceHash»"]]'''
+			val vector = queryVector(query, connection.db)
+			val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
+			val source = sourceOpt.get()
+			val credit = switch (source.getSource().getSourceType()) {
 				case CROSS_REFERENCE: 100
 				case CITATION: 100
 				case VIDEO: 80
@@ -112,16 +122,12 @@ import com.sirolf2009.thewarofwords.common.model.Account
 				case TWEET: 20
 				case RUMOUR: 1
 			} * getAccount(upvote.getVoter()).map[1 + credibility / 100].orElse(1d)
-			val account = source.key.getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.key, source.key.encoded.toHexString(), credit))
+			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
 			return '''
 			{:account/key "«account.getKey().encoded.toHexString()»"
 			 :account/username "«account.getUsername()»"
 			 :account/credibility «account.getCredibility()»}'''
 		].toList()
-		// TODO prepared statements
-		log.trace("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
-		log.trace("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
-		log.trace("new block: {}", execute(#[blockQuery]))
 		log.trace("new credits: {}", execute(creditsQuery))
 
 		return new State(connection, connection.db, blockNumber + 1)
@@ -189,13 +195,13 @@ import com.sirolf2009.thewarofwords.common.model.Account
 	def getSources() {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e source/hash _]]''').toMap([parseSourceHash()], [parseSourceOwner() -> parseSource()])
+		 :where [?e source/hash _]]''').map[parseSource()]
 	}
 
 	def getSource(Hash sourceHash) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e source/hash "«sourceHash»"]]''').stream().map[parseSourceOwner() -> parseSource()].findFirst()
+		 :where [?e source/hash "«sourceHash»"]]''').stream().map[parseSource()].findFirst()
 	}
 
 	def getSources(Hash topicHash) {
@@ -203,7 +209,7 @@ import com.sirolf2009.thewarofwords.common.model.Account
 		[:find [?e ...]
 		 :where [?topic topic/hash "«topicHash»"]
 		        [?topic topic/refers ?reference]
-		        [?e source/hash ?reference]]''').toMap([parseSourceHash()], [parseSourceOwner() -> parseSource()])
+		        [?e source/hash ?reference]]''').map[parseSource()]
 	}
 
 	def getUpvotes(PublicKey key) {
@@ -218,7 +224,7 @@ import com.sirolf2009.thewarofwords.common.model.Account
 		val entity = database.entity(blockID)
 		val key = CryptoHelper.publicKey((entity.get(":account/key") as String).toByteArray)
 		val username = entity.get(":account/username") as String
-		val credibility = entity.get(":account/credibility") as Long
+		val credibility = entity.get(":account/credibility") as Double
 		return new Account(key, username, credibility)
 	}
 
@@ -244,30 +250,34 @@ import com.sirolf2009.thewarofwords.common.model.Account
 		return new Topic(name, description, tags)
 	}
 
-	def protected parseSourceHash(Object sourceHash) {
-		val entity = database.entity(sourceHash)
-		return new Hash(entity.get(":source/hash") as String)
-	}
-
-	def protected parseSourceOwner(Object sourceHash) {
-		val entity = database.entity(sourceHash)
-		return CryptoHelper.publicKey((entity.get(":source/owner") as String).toByteArray)
-	}
-
 	def protected parseSource(Object sourceHash) {
+		return parseSource(sourceHash, database)
+	}
+
+	def protected parseSource(Object sourceHash, Database database) {
 		val entity = database.entity(sourceHash)
+		val hash = new Hash(entity.get(":source/hash") as String)
+		val owner = CryptoHelper.publicKey((entity.get(":source/owner") as String).toByteArray)
 		val source = entity.get(":source/source") as String
 		val comment = entity.get(":source/comment") as String
 		val type = entity.get(":source/type") as String
-		return new Source(SourceType.valueOf(type), new URL(source), comment)
+		return new SavedSource(hash, owner, new Source(SourceType.valueOf(type), new URL(source), comment))
 	}
 
 	def private query(String query) {
+		return query(query, database)
+	}
+
+	def private static query(String query, Database database) {
 		log.debug("Executing query {}", query)
 		return Peer.query(query, database) as HashSet<PersistentVector>
 	}
 
 	def private queryVector(String query) {
+		return queryVector(query, database)
+	}
+
+	def private static queryVector(String query, Database database) {
 		log.debug("Executing query {}", query)
 		return Peer.query(query, database) as PersistentVector
 	}

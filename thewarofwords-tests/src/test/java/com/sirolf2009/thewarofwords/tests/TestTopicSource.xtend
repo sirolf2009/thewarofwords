@@ -53,9 +53,9 @@ class TestTopicSource {
 			assertTrue(tags.toString(), tags.contains("topic"))
 
 			assertEquals(sources.toString(), 1, sources.size())
-			assertEquals(sources.toString(), SourceType.ARTICLE, sources.values.get(0).value.sourceType)
-			assertEquals(sources.toString(), "https://github.com/sirolf2009/thewarofwords", sources.values.get(0).value.source.toString())
-			assertEquals(sources.toString(), "All you're base are belong to us", sources.values.get(0).value.comment)
+			assertEquals(sources.toString(), SourceType.ARTICLE, sources.get(0).getSource().sourceType)
+			assertEquals(sources.toString(), "https://github.com/sirolf2009/thewarofwords", sources.get(0).getSource().getSource().toString())
+			assertEquals(sources.toString(), "All you're base are belong to us", sources.get(0).getSource().getComment())
 		]
 	}
 	

@@ -1,13 +1,13 @@
 package com.sirolf2009.thewarofwords.ui.component
 
-import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.objectchain.common.model.Hash
+import com.sirolf2009.thewarofwords.common.model.SavedSource
 import com.sirolf2009.thewarofwords.common.model.SourceType
+import com.sirolf2009.thewarofwords.ui.MainController
 import javafx.scene.control.Label
-import org.tbee.javafx.scene.layout.MigPane
 import javafx.scene.text.Font
 import javafx.scene.text.FontPosture
-import com.sirolf2009.thewarofwords.ui.MainController
-import com.sirolf2009.objectchain.common.model.Hash
+import org.tbee.javafx.scene.layout.MigPane
 
 class CitationCard extends SourceCard {
 
@@ -17,18 +17,18 @@ class CitationCard extends SourceCard {
 		Font.getDefault().getSize()*1.4
 	)
 
-	new(MainController controller, Hash topicHash, Hash sourceHash, Source source) {
-		super(controller, topicHash, sourceHash, source)
-		if(source.getSourceType() != SourceType.CITATION) {
+	new(MainController controller, Hash topicHash, SavedSource source) {
+		super(controller, topicHash, source)
+		if(source.getSource().getSourceType() != SourceType.CITATION) {
 			throw new IllegalArgumentException('''«source» is not a citation''')
 		}
 
 		setContent(new MigPane("aligny center") => [
-			add(new Label(source.getComment()) => [
+			add(new Label(source.getSource().getComment()) => [
 //				styleClass += "citation"
 				font = ITALIC_FONT
 			], "wrap, center")
-			add(new Label("Citation: "+source.getSource().toExternalForm()) => [
+			add(new Label("Citation: "+source.getSource().getSource().toExternalForm()) => [
 				styleClass += "description"
 			], "right")
 		])

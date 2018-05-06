@@ -56,6 +56,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
                         <Label text="Connected" />
@@ -64,6 +65,8 @@
                         <Label fx:id="lblLastBlock" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Label text="# Nodes" GridPane.rowIndex="2" />
                         <Label fx:id="lblNodeCount" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="My Credibility" GridPane.rowIndex="3" />
+                        <Label fx:id="lblCredibility" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                      </children>
                   </GridPane>
                </content>

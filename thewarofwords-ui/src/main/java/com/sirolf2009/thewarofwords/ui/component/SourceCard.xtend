@@ -1,15 +1,15 @@
 package com.sirolf2009.thewarofwords.ui.component
 
 import com.sirolf2009.objectchain.common.model.Hash
-import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.common.model.SavedSource
 import com.sirolf2009.thewarofwords.ui.MainController
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
-import javafx.scene.Node
 import javafx.scene.web.WebView
 
 class SourceCard extends Card {
@@ -18,15 +18,15 @@ class SourceCard extends Card {
 	static val filledImage = new Image("images/heart-filled-16.png")
 	
 	val MainController controller
-	val Source source
+	val SavedSource source
 
-	new(MainController controller, Hash topicHash, Hash sourceHash, Source source) {
+	new(MainController controller, Hash topicHash, SavedSource source) {
 		this.controller = controller
 		this.source = source
 		setHeader(new HBox() => [ container |
 			container.alignment = Pos.TOP_RIGHT
 			container.getChildren().add(new Pane() => [
-				val hasUpvoted = controller.getFacade().hasUpvoted(sourceHash, topicHash)
+				val hasUpvoted = controller.getFacade().hasUpvoted(source.getHash(), topicHash)
 				val image = new ImageView(if(hasUpvoted) filledImage else emptyImage) => [
 					fitWidth = 16
 					fitHeight = 16
@@ -35,7 +35,7 @@ class SourceCard extends Card {
 				getChildren().add(image)
 				if(!hasUpvoted) {
 					onMouseClicked = [ e |
-						controller.getFacade().upvote(sourceHash, topicHash)
+						controller.getFacade().upvote(source.getHash(), topicHash)
 						image.setImage(filledImage)
 						onMouseClicked = []
 					]
@@ -49,7 +49,7 @@ class SourceCard extends Card {
 		node.onMouseClicked = [
 			val browser = new WebView()
 			val webEngine = browser.getEngine()
-			webEngine.load(source.getSource().toExternalForm())
+			webEngine.load(source.getSource().getSource().toExternalForm())
 			controller.setNewsContent(browser)
 		]
 	}

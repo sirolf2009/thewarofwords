@@ -1,7 +1,7 @@
 package com.sirolf2009.thewarofwords.ui.component
 
 import com.sirolf2009.objectchain.common.model.Hash
-import com.sirolf2009.thewarofwords.common.model.Source
+import com.sirolf2009.thewarofwords.common.model.SavedSource
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.ui.MainController
 import com.sirolf2009.thewarofwords.ui.thumbnail.Thumbnails
@@ -13,19 +13,19 @@ import org.tbee.javafx.scene.layout.MigPane
 
 class ArticleCard extends SourceCard {
 
-	new(MainController controller, Hash topicHash, Hash sourceHash, Source source) {
-		super(controller, topicHash, sourceHash, source)
-		if(source.getSourceType() != SourceType.ARTICLE) {
+	new(MainController controller, Hash topicHash, SavedSource source) {
+		super(controller, topicHash, source)
+		if(source.getSource().getSourceType() != SourceType.ARTICLE) {
 			throw new IllegalArgumentException('''«source» is not an article''')
 		}
 
 		setContent(new MigPane() => [
-			add(new Label(source.getComment()) => [
+			add(new Label(source.getSource().getComment()) => [
 				styleClass += "title"
 				setWrapText(true)
         		setTextAlignment(TextAlignment.JUSTIFY)
 			], "wrap")
-			val thumbnailOpt = Thumbnails.getThumbnail(source.getSource().toString())
+			val thumbnailOpt = Thumbnails.getThumbnail(source.getSource().getSource().toString())
 			if(thumbnailOpt.isPresent()) {
 				add(new ImageView(thumbnailOpt.get().getUrl()) => [
 					styleClass += "image"
@@ -39,7 +39,7 @@ class ArticleCard extends SourceCard {
 					styleClass += "description"
 				], "wrap")
 			} else {
-				add(new Button(source.getComment()))
+				add(new Button(source.getSource().getComment()))
 			}
 			maxWidth = 400
 		])

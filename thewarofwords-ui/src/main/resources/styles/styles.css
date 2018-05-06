@@ -16,6 +16,10 @@
 .main-tab:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
   -fx-border-color: transparent;
 }
+.text-field.error {
+  -fx-text-box-border: #ff6663 ;
+  -fx-focus-color: #ff6663 ;
+}
 
 .newsContentItem {
 	-fx-background-color: white ;
