@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -15,19 +18,19 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Pane?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sirolf2009.thewarofwords.ui.MainController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.172" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sirolf2009.thewarofwords.ui.MainController">
 	<children>
 		<TabPane prefHeight="400.0" prefWidth="600.0" side="LEFT" styleClass="main-tab" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
 			<tabs>
 				<Tab closable="false" text="News">
 					<content>
-						<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+						<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER">
 							<content>
 								<VBox>
 									<children>
-										<ToolBar>
+										<ToolBar styleClass="toolbar">
 											<items>
-												<Button fx:id="popButton" mnemonicParsing="false" onAction="#pop" text="&lt;" />
+												<Button fx:id="popButton" mnemonicParsing="false" onAction="#pop" styleClass="toolbar" text="&lt;" />
 												<Button mnemonicParsing="false" onAction="#loadTopics" text="Load Topics" />
 												<Button mnemonicParsing="false" onAction="#newTopic" text="New Topic" />
 											</items>
@@ -44,7 +47,7 @@
 						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
 					</content>
 				</Tab>
-				<Tab closable="false" text="Settings" fx:id="settingsTab">
+				<Tab fx:id="settingsTab" closable="false" text="Settings">
 				</Tab>
 				<Tab closable="false" text="Network">
 					<content>
@@ -74,9 +77,9 @@
 				</Tab>
 			</tabs>
 		</TabPane>
-		<Pane>
+		<Pane pickOnBounds="false">
 			<children>
-				<Label styleClass="app-title" text="the war of words" alignment="TOP_LEFT"></Label>
+				<Label alignment="TOP_LEFT" styleClass="app-title" text="the war of words" />
 			</children>
 		</Pane>
 	</children>

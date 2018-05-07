@@ -6,6 +6,7 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.Stage
 import org.apache.logging.log4j.LogManager
+import javafx.scene.text.Font
 
 class TheWarOfWords extends Application {
 
@@ -14,6 +15,8 @@ class TheWarOfWords extends Application {
 	var MainController controller
 
 	override start(Stage stage) throws Exception {
+		Font.loadFont(TheWarOfWords.getResource("/fonts/Aurella.ttf").toExternalForm(), 10)		
+		
 		val fxmlFile = "/fxml/main.fxml"
 		log.debug("Loading FXML for main view from: {}", fxmlFile)
 		val loader = new FXMLLoader()

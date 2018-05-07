@@ -125,7 +125,7 @@ import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 	}
 	
 	def getCredit(SavedSource source) {
-		getUpvotes(source.getHash()).map[getCredit()].reduce[a,b|a+b]
+		getUpvotes(source.getHash()).stream().map[getCredit()].reduce[a,b|a+b].orElse(0d)
 	}
 
 	def getCredit(SavedUpvote upvote) {
@@ -292,8 +292,8 @@ import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 		val entity = database.entity(blockID)
 		val hash = new Hash(entity.get(":upvote/hash") as String)
 		val voter = CryptoHelper.publicKey((entity.get(":upvote/voter") as String).toByteArray())
-		val source = new Hash(entity.get(":topic/source") as String)
-		val topic = new Hash(entity.get(":topic/topic") as String)
+		val source = new Hash(entity.get(":upvote/source") as String)
+		val topic = new Hash(entity.get(":upvote/topic") as String)
 		return new SavedUpvote(hash, new Upvote(voter, source, topic))
 	}
 

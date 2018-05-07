@@ -6,6 +6,7 @@ import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsFacade
+import com.sirolf2009.thewarofwords.ui.component.Home
 import com.sirolf2009.thewarofwords.ui.component.NewSource
 import com.sirolf2009.thewarofwords.ui.component.NewTopic
 import com.sirolf2009.thewarofwords.ui.component.TopicOverview
@@ -59,13 +60,14 @@ class MainController {
 		node.getIsSynchronised().addListener [
 			if(node.getIsSynchronised().get()) {
 				Platform.runLater [
-					loadTopics()
+//					loadTopics()
+					newsContent = new Home(this)
 				]
 			}
 		]
-		
+
 		settingsTab.setContent(new FXForm(settings))
-		
+
 		popButton.disableProperty().bind(Bindings.lessThan(Bindings.size(newsContent.getChildren()), 2))
 
 		lblIsConnected.textProperty().bind(node.getIsConnected().asString())
@@ -73,16 +75,16 @@ class MainController {
 		lblNodeCount.textProperty().bind(node.getNodes().asString())
 		lblCredibility.textProperty().bind(node.getCredibility().asString())
 	}
-	
+
 	def void run(Runnable runnable) {
 		executor.execute(runnable)
 	}
-	
+
 	def <T> ReadOnlyObjectProperty<T> runTask(Task<T> task) {
 		executor.execute(task)
 		return task.valueProperty()
 	}
-	
+
 	def showTopic(Hash topicHash, Topic topic) {
 		setNewsContent(new TopicOverview(this, topicHash, topic))
 	}
@@ -94,12 +96,12 @@ class MainController {
 	def loadTopics() {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
-	
+
 	def newSource(Hash topicHash, Topic topic) {
 		setNewsContent(new NewSource(this) [ source |
 			try {
 				source.verifyStatic()
-				new Thread[
+				new Thread [
 					val newSource = facade.postSource(source)
 					facade.refer(topicHash, node.hash(newSource))
 				].start()
@@ -108,7 +110,7 @@ class MainController {
 			}
 		])
 	}
-	
+
 	def newTopic() {
 		setNewsContent(new NewTopic(this) [ topic |
 			if(topic.verify()) {
@@ -116,10 +118,10 @@ class MainController {
 			}
 		])
 	}
-	
+
 	@FXML def pop() {
 		val popped = newsContent.getChildren().last()
-		new TranslateTransition(new Duration(100), popped) =>  [
+		new TranslateTransition(new Duration(100), popped) => [
 			fromX = 0
 			toX = newsContent.getWidth()
 			onFinished = [newsContent.getChildren().remove(popped)]
@@ -130,7 +132,7 @@ class MainController {
 
 	def setNewsContent(Node node) {
 		newsContent.getChildren().add(node)
-		new TranslateTransition(new Duration(350), node) =>  [
+		new TranslateTransition(new Duration(350), node) => [
 			fromX = newsContent.getWidth()
 			toX = 0
 			play()
@@ -153,7 +155,6 @@ class MainController {
 		return new KeyPair(Keys.readPublicKeyFromFile(publicKey), Keys.readPrivateKeyFromFile(privateKey))
 	}
 
-	
 	def static maximize(Node node) {
 		AnchorPane.setTopAnchor(node, 0d)
 		AnchorPane.setRightAnchor(node, 0d)
@@ -161,6 +162,5 @@ class MainController {
 		AnchorPane.setLeftAnchor(node, 0d)
 		return node
 	}
-	
 
 }

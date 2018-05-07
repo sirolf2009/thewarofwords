@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root maxHeight="1.7976931348623157E308" styleClass="home" stylesheets="@../styles/styles.css" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.172" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <StackPane>
+         <children>
+            <ImageView fx:id="bannerImg" blendMode="DIFFERENCE" fitHeight="145.0" fitWidth="820.0" pickOnBounds="true" preserveRatio="false">
+               <image>
+                  <Image url="@../images/background.jpg" />
+               </image>
+               <viewport>
+                  <Rectangle2D height="300.0" minY="300.0" width="1700.0" />
+               </viewport>
+            </ImageView>
+            <Label styleClass="home-title" text="The War of Words">
+               <effect>
+                  <Lighting bumpInput="$null" diffuseConstant="2.0" specularConstant="0.0" specularExponent="40.0" surfaceScale="0.9">
+                     <light>
+                        <Light.Distant color="#bc5757" elevation="36.43" />
+                     </light>
+                  </Lighting>
+               </effect></Label>
+         </children>
+      </StackPane>
+      <HBox maxHeight="1.7976931348623157E308" prefHeight="100.0">
+         <children>
+            <VBox maxHeight="1.7976931348623157E308" prefHeight="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Recent" />
+                  <Separator prefWidth="200.0" />
+                  <AnchorPane fx:id="recentTopics" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" />
+               </children>
+            </VBox>
+            <VBox maxHeight="1.7976931348623157E308" prefHeight="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Most Credit" textAlignment="CENTER" />
+                  <Separator prefWidth="200.0" />
+                  <AnchorPane fx:id="creditTopics" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" />
+               </children>
+            </VBox>
+            <VBox maxHeight="1.7976931348623157E308" prefHeight="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Most sources" />
+                  <Separator prefWidth="200.0" />
+                  <AnchorPane fx:id="sourceTopics" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets top="16.0" />
+         </padding>
+      </HBox>
+   </children>
+</fx:root>

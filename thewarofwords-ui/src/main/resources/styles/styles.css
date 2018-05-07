@@ -53,6 +53,18 @@
 	-fx-padding: 16.0px;
 }
 
+.home-title {
+	-fx-font-size: 6em;
+	/*-fx-text-fill: #05FFFF;*/
+	-fx-text-fill: #ff6663;
+	-fx-font-family: "Aurella"
+}
+.category-title {
+	-fx-font-size: 2em;
+	-fx-text-fill: #0d1321;
+	-fx-font-weight: bold;
+}
+
 .topicOverview > .title {
 	-fx-font-size: 4em;
 	-fx-background-color: #0b3954;
