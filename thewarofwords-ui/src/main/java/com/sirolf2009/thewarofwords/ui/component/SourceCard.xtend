@@ -11,6 +11,8 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
 import javafx.scene.web.WebView
+import javafx.scene.control.Label
+import javafx.concurrent.Task
 
 class SourceCard extends Card {
 
@@ -40,6 +42,17 @@ class SourceCard extends Card {
 						onMouseClicked = []
 					]
 				}
+			])
+			container.getChildren().add(new Label() => [
+				controller.runTask(new Task<String>() {
+					override protected call() throws Exception {
+						return String.valueOf(controller.getFacade().getCredit(source))
+					}
+				} => [task|
+					task.onSucceeded = [evt|
+						text = task.getValue()
+					]
+				])
 			])
 		])
 	}

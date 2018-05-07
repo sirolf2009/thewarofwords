@@ -148,6 +148,7 @@ import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 			case TWEET: 20
 			case RUMOUR: 1
 		} * getAccount(upvote.getUpvote().getVoter()).map[1 + credibility / 100].orElse(1d)
+		//TODO when in prod, a certain amount of credibility must already be assigned before credit counts
 	}
 
 	override toString() {

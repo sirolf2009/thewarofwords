@@ -67,6 +67,7 @@ class TheWarOfWordsNode extends Node {
 		Peer.createDatabase(uri)
 		val conn = Peer.connect(uri)
 		Schema.addSchema(conn)
+		//TODO in genesis, sirolf2009 (as a public key) should have credibility
 		return new Configuration.Builder().setGenesisState(new State(conn, conn.db, 0)).build()
 	}
 
