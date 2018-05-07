@@ -108,11 +108,11 @@ import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 			val upvote = mutation.object as Upvote
 			val query = '''
 			[:find [?e ...]
-			 :where [?e :source/hash "«upvote.sourceHash»"]]'''
+			 :where [?e source/hash "«upvote.sourceHash»"]]'''
 			val vector = queryVector(query, connection.db)
 			val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
 			val source = sourceOpt.get()
-			val credit = getCredit(new SavedUpvote(upvote.hash(kryo), upvote))
+			val credit = getCredit(new SavedUpvote(mutation.hash(kryo), upvote))
 			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
 			return '''
 			{:account/key "«account.getKey().encoded.toHexString()»"
