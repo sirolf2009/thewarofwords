@@ -55,10 +55,10 @@ class TestState {
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet(#[topic]))
 		val newState = state.apply(kryo(), block) as State
 		assertFalse(newState.getTopics().empty)
-		val newStateTopic = newState.getTopics().get(topic.hash(kryo()))
+		val newStateTopic = newState.getTopics().findFirst[getHash().equals(topic.hash(kryo()))].getTopic()
 		assertEquals("Topic", newStateTopic.name)
 		assertEquals("description", newStateTopic.description)
-		assertEquals(#["a", "b", "c"].toSet(), newState.getTopics().get(topic.hash(kryo())).tags)
+		assertEquals(#["a", "b", "c"].toSet(), newStateTopic.tags)
 		assertTrue(newState.getSources().empty)
 	}
 	

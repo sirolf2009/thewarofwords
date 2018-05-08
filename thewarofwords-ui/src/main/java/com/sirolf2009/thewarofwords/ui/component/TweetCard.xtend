@@ -1,7 +1,7 @@
 package com.sirolf2009.thewarofwords.ui.component
 
-import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.SavedSource
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.ui.MainController
@@ -20,8 +20,8 @@ class TweetCard extends SourceCard {
 	
 	val ReadOnlyObjectProperty<Tweet> tweetProperty
 	
-	new(MainController controller, Hash topicHash, SavedSource source) {
-		super(controller, topicHash, source)
+	new(MainController controller, SavedTopic topic, SavedSource source) {
+		super(controller, topic, source)
 		if(source.getSource().getSourceType() != SourceType.TWEET) {
 			throw new IllegalArgumentException('''«source» is not a tweet''')
 		}

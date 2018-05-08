@@ -1,12 +1,14 @@
 package com.sirolf2009.thewarofwords.ui.component
 
-import javafx.scene.layout.VBox
-import javafx.fxml.FXMLLoader
-import javafx.fxml.FXML
-import javafx.scene.image.ImageView
-import javafx.geometry.Rectangle2D
-import javafx.scene.layout.AnchorPane
 import com.sirolf2009.thewarofwords.ui.MainController
+import java.util.stream.Collectors
+import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
+import javafx.geometry.Rectangle2D
+import javafx.scene.Node
+import javafx.scene.image.ImageView
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.VBox
 
 class Home extends VBox {
 	
@@ -31,12 +33,22 @@ class Home extends VBox {
 			val vp = bannerImg.viewport
 			bannerImg.viewport = new Rectangle2D(vp.minX, vp.minY, bannerImg.image.width, (bannerImg.image.height/width)*145+145)
 		]
-		val recentOverview = new TopicsOverview(controller, controller.getFacade().getTopics())
+		val recentOverview = new TopicsOverview(controller, controller.getFacade().getTopics().stream().limit(10).collect(Collectors.toList()))
 		recentTopics.getChildren.add(recentOverview)
-		AnchorPane.setTopAnchor(recentOverview, 0d)
-		AnchorPane.setRightAnchor(recentOverview, 0d)
-		AnchorPane.setBottomAnchor(recentOverview, 0d)
-		AnchorPane.setLeftAnchor(recentOverview, 0d)
+		recentOverview.maximize()
+		val creditOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).map[controller.getFacade().getCredit(it)].reduce[a,b|a+b]].reverse().stream().limit(10).collect(Collectors.toList()))
+		creditTopics.getChildren.add(creditOverview)
+		creditOverview.maximize()
+		val sourceOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).size()].reverse().stream().limit(10).collect(Collectors.toList()))
+		sourceTopics.getChildren.add(sourceOverview)
+		sourceOverview.maximize()
+	}
+	
+	def void maximize(Node node) {
+		AnchorPane.setTopAnchor(node, 0d)
+		AnchorPane.setRightAnchor(node, 0d)
+		AnchorPane.setBottomAnchor(node, 0d)
+		AnchorPane.setLeftAnchor(node, 0d)
 	}
 
 }

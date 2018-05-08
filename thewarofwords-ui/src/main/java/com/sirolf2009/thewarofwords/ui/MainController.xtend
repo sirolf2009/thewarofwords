@@ -2,9 +2,8 @@ package com.sirolf2009.thewarofwords.ui
 
 import com.dooapp.fxform.FXForm
 import com.sirolf2009.objectchain.common.crypto.Keys
-import com.sirolf2009.objectchain.common.model.Hash
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.Source
-import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsFacade
 import com.sirolf2009.thewarofwords.ui.component.Home
 import com.sirolf2009.thewarofwords.ui.component.NewSource
@@ -85,8 +84,8 @@ class MainController {
 		return task.valueProperty()
 	}
 
-	def showTopic(Hash topicHash, Topic topic) {
-		setNewsContent(new TopicOverview(this, topicHash, topic))
+	def showTopic(SavedTopic topic) {
+		setNewsContent(new TopicOverview(this, topic))
 	}
 
 	def showSource(String sourceHash, Source source) {
@@ -97,13 +96,13 @@ class MainController {
 		setNewsContent(new TopicsOverview(this, facade.getTopics))
 	}
 
-	def newSource(Hash topicHash, Topic topic) {
+	def newSource(SavedTopic topic) {
 		setNewsContent(new NewSource(this) [ source |
 			try {
 				source.verifyStatic()
 				new Thread [
 					val newSource = facade.postSource(source)
-					facade.refer(topicHash, node.hash(newSource))
+					facade.refer(topic.getHash(), node.hash(newSource))
 				].start()
 				pop()
 			} catch(Exception e) {

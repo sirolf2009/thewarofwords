@@ -1,22 +1,21 @@
 package com.sirolf2009.thewarofwords.ui.component
 
-import com.sirolf2009.objectchain.common.model.Hash
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.SourceType
-import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.ui.MainController
+import java.util.ArrayList
+import java.util.LinkedList
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.collections.FXCollections
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
-import org.tbee.javafx.scene.layout.MigPane
 import javafx.scene.layout.VBox
-import java.util.LinkedList
-import java.util.ArrayList
-import javafx.scene.Node
+import org.tbee.javafx.scene.layout.MigPane
 
 class TopicOverview extends MigPane {
 
@@ -26,32 +25,32 @@ class TopicOverview extends MigPane {
 		alignment = Pos.CENTER
 	]
 
-	new(MainController controller, Hash topicHash, Topic topic) {
+	new(MainController controller, SavedTopic topic) {
 		super("fillx")
 		styleClass += #["newsContentItem", "topicOverview"]
-		add(new Label(topic.getName()) => [
+		add(new Label(topic.getTopic().getName()) => [
 			styleClass += "title"
 			alignment = Pos.CENTER
 		], "span, wrap, growx")
-		add(new Label(topic.getDescription()) => [
+		add(new Label(topic.getTopic().getDescription()) => [
 			styleClass += "description"
 		], "span 2, growx")
 		add(new Button("Add source") => [
-			onAction = [controller.newSource(topicHash, topic)]
+			onAction = [controller.newSource(topic)]
 		], "wrap, right")
 		add(sourcesContainer, "span, grow")
 
-		controller.getFacade().getSources(topicHash).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [ source |
+		controller.getFacade().getSources(topic.getHash()).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [ source |
 			if(source.getSource().getSourceType() == SourceType.CITATION) {
-				sources.add(new CitationCard(controller, topicHash, source) => [
+				sources.add(new CitationCard(controller, topic, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
 			} else if(source.getSource().getSourceType() == SourceType.TWEET) {
-				sources.add(new TweetCard(controller, topicHash, source) => [
+				sources.add(new TweetCard(controller, topic, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
 			} else {
-				sources.add(new ArticleCard(controller, topicHash, source) => [
+				sources.add(new ArticleCard(controller, topic, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
 			}

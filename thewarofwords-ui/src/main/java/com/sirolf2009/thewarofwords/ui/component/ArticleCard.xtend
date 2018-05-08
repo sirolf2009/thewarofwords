@@ -1,7 +1,7 @@
 package com.sirolf2009.thewarofwords.ui.component
 
-import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.SavedSource
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.ui.MainController
 import com.sirolf2009.thewarofwords.ui.thumbnail.Thumbnails
@@ -13,8 +13,8 @@ import org.tbee.javafx.scene.layout.MigPane
 
 class ArticleCard extends SourceCard {
 
-	new(MainController controller, Hash topicHash, SavedSource source) {
-		super(controller, topicHash, source)
+	new(MainController controller, SavedTopic topic, SavedSource source) {
+		super(controller, topic, source)
 		if(source.getSource().getSourceType() != SourceType.ARTICLE) {
 			throw new IllegalArgumentException('''«source» is not an article''')
 		}

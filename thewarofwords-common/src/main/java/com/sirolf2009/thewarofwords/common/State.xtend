@@ -2,11 +2,16 @@ package com.sirolf2009.thewarofwords.common
 
 import clojure.lang.PersistentVector
 import com.esotericsoftware.kryo.Kryo
+import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.objectchain.common.interfaces.IState
 import com.sirolf2009.objectchain.common.model.Block
 import com.sirolf2009.objectchain.common.model.BlockHeader
 import com.sirolf2009.objectchain.common.model.Hash
+import com.sirolf2009.thewarofwords.common.model.Account
 import com.sirolf2009.thewarofwords.common.model.Reference
+import com.sirolf2009.thewarofwords.common.model.SavedSource
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
+import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
@@ -30,10 +35,6 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
-import com.sirolf2009.objectchain.common.crypto.CryptoHelper
-import com.sirolf2009.thewarofwords.common.model.Account
-import com.sirolf2009.thewarofwords.common.model.SavedSource
-import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 
 @Data class State implements IState {
 
@@ -180,9 +181,7 @@ import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 		val response = queryVector('''
 		[:find [?e ...]
 		 :where [?e topic/hash _]]''')
-		response.map [
-			new Hash(database.entity(it).get(":topic/hash") as String) -> parseTopic(it)
-		].toMap([key], [value])
+		response.map [parseTopic(it)].toList()
 	}
 
 	def getBlocknumberForTopic(Hash topicHash) {
@@ -273,15 +272,16 @@ import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 		val topics = entity.get(":block/added-topics") as Set<String>
 
 		val header = new BlockHeader(new Hash(previousBlock), new Hash(merkleroot), new Date(time), new BigInteger(target.toByteArray()), nonce.intValue())
-		return new Block(header, new TreeSet(#[sources.map[parseSource], topics.map[parseTopic]]))
+		return new Block(header, new TreeSet(#[sources.map[parseSource().getSource()], topics.map[parseTopic().getTopic()]]))
 	}
 
 	def protected parseTopic(Object blockID) {
 		val entity = database.entity(blockID)
+		val hash = new Hash(entity.get(":topic/hash") as String)
 		val name = entity.get(":topic/name") as String
 		val description = entity.get(":topic/description") as String
 		val tags = entity.get(":topic/tags") as Set<String>
-		return new Topic(name, description, tags)
+		return new SavedTopic(hash, new Topic(name, description, tags))
 	}
 
 	def protected parseUpvote(Object blockID) {

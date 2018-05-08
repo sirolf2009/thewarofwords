@@ -1,18 +1,18 @@
 package com.sirolf2009.thewarofwords.ui.component
 
-import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.SavedSource
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.ui.MainController
+import javafx.concurrent.Task
 import javafx.geometry.Pos
 import javafx.scene.Node
+import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
 import javafx.scene.web.WebView
-import javafx.scene.control.Label
-import javafx.concurrent.Task
 
 class SourceCard extends Card {
 
@@ -22,13 +22,13 @@ class SourceCard extends Card {
 	val MainController controller
 	val SavedSource source
 
-	new(MainController controller, Hash topicHash, SavedSource source) {
+	new(MainController controller, SavedTopic topic, SavedSource source) {
 		this.controller = controller
 		this.source = source
 		setHeader(new HBox() => [ container |
 			container.alignment = Pos.TOP_RIGHT
 			container.getChildren().add(new Pane() => [
-				val hasUpvoted = controller.getFacade().hasUpvoted(source.getHash(), topicHash)
+				val hasUpvoted = controller.getFacade().hasUpvoted(source.getHash(), topic.getHash())
 				val image = new ImageView(if(hasUpvoted) filledImage else emptyImage) => [
 					fitWidth = 16
 					fitHeight = 16
@@ -37,7 +37,7 @@ class SourceCard extends Card {
 				getChildren().add(image)
 				if(!hasUpvoted) {
 					onMouseClicked = [ e |
-						controller.getFacade().upvote(source.getHash(), topicHash)
+						controller.getFacade().upvote(source.getHash(), topic.getHash())
 						image.setImage(filledImage)
 						onMouseClicked = []
 					]

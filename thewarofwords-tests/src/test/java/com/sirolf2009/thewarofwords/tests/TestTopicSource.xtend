@@ -41,9 +41,9 @@ class TestTopicSource {
 
 			node2.getLastState() => [
 				assertEquals(topics.toString(), 1, topics.size())
-				assertEquals(topics.toString(), "Test Topic", topics.values.get(0).name)
-				assertEquals(topics.toString(), "description", topics.values.get(0).description)
-				val tags = topics.values.get(0).tags
+				assertEquals(topics.toString(), "Test Topic", topics.get(0).getTopic().getName())
+				assertEquals(topics.toString(), "description", topics.get(0).getTopic().getDescription())
+				val tags = topics.get(0).getTopic().getTags()
 				assertEquals(tags.toString(), 2, tags.size())
 				assertTrue(tags.toString(), tags.contains("test"))
 				assertTrue(tags.toString(), tags.contains("topic"))
