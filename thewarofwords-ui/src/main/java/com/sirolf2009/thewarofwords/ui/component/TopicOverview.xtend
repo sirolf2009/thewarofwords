@@ -49,6 +49,10 @@ class TopicOverview extends MigPane {
 				sources.add(new TweetCard(controller, topic, source) => [
 					FlowPane.setMargin(it, new Insets(4))
 				])
+			} else if(source.getSource().getSourceType() == SourceType.VIDEO) {
+				sources.add(new VideoCard(controller, topic, source) => [
+					FlowPane.setMargin(it, new Insets(4))
+				])
 			} else {
 				sources.add(new ArticleCard(controller, topic, source) => [
 					FlowPane.setMargin(it, new Insets(4))
@@ -63,25 +67,25 @@ class TopicOverview extends MigPane {
 				this.columnCount.set(columnCount)
 			}
 		]
-		columnCount.addListener[
+		columnCount.addListener [
 			layoutSources
 		]
 	}
-	
+
 	def layoutSources() {
 		sourcesContainer.getChildren().clear()
 		val columns = new ArrayList()
-		(0 ..< columnCount.get()).forEach[
+		(0 ..< columnCount.get()).forEach [
 			val column = new VBox()
 			sourcesContainer.getChildren().add(column)
 			columns.add(column)
 		]
 		val queue = new LinkedList(columns)
-		sources.forEach[
+		sources.forEach [
 			if(queue.isEmpty()) {
 				queue.addAll(columns)
 			}
-			val column = queue.pop() 
+			val column = queue.pop()
 			column.getChildren().add(it)
 		]
 	}

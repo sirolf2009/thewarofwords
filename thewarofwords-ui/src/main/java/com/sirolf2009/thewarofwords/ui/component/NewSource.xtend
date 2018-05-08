@@ -5,6 +5,8 @@ import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.ui.MainController
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.List
+import java.util.Optional
 import java.util.function.Consumer
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -45,11 +47,30 @@ class NewSource extends MutationForm<Source> {
 			textProperty().addListener[notifyChanged()]
 		], "growx, wrap")
 		add(new Label("Type"))
-		add(new ComboBox(FXCollections.observableArrayList(SourceType.values)) => [
+		add(new ComboBox(FXCollections.observableArrayList()) => [
 			type.bind(valueProperty())
 			valueProperty().addListener[notifyChanged()]
+			url.addListener [obs,oldVal,newVal|
+				items.clear()
+				items.addAll(getSourceType().orElse(#[]))
+			]
 		], "growx, wrap")
 		addFooter(onSubmitted)
+	}
+	
+	def Optional<List<SourceType>> getSourceType() {
+		try {
+			switch(new URL(url.get()).getHost()) {
+				case "nature.com": Optional.of(#[SourceType.CITATION, SourceType.ARTICLE, SourceType.TRUSTED])
+				case "sciencemag.org": Optional.of(#[SourceType.CITATION, SourceType.ARTICLE, SourceType.TRUSTED])
+				case "humanprogress.org": Optional.of(#[SourceType.CITATION, SourceType.ARTICLE, SourceType.TRUSTED])
+				case "youtube.com": Optional.of(#[SourceType.CITATION, SourceType.ARTICLE, SourceType.VIDEO])
+				case "twitter.com": Optional.of(#[SourceType.CITATION, SourceType.ARTICLE, SourceType.TWEET])
+				default: Optional.of(#[SourceType.CITATION, SourceType.ARTICLE])
+			}
+		} catch(Exception e) {
+			return Optional.empty()
+		}
 	}
 	
 	override getMutation() {
