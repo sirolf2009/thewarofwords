@@ -139,15 +139,13 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
 		val source = sourceOpt.orElseThrow[new RuntimeException("Could not find source accompanying "+upvote)]
 		return switch (source.getSource().getSourceType()) {
-			case CROSS_REFERENCE: 100
+			case TRUSTED: 100
 			case CITATION: 100
 			case VIDEO: 80
 			case DEBATE: 80
 			case ARTICLE: 50
-			case VERIFIED_TWEET: 40
 			case BLOG: 30
 			case TWEET: 20
-			case RUMOUR: 1
 		} * getAccount(upvote.getUpvote().getVoter()).map[1 + credibility / 100].orElse(1d)
 		//TODO when in prod, a certain amount of credibility must already be assigned before credit counts
 	}

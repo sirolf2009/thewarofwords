@@ -14,8 +14,9 @@ import javafx.scene.control.ProgressBar
 import org.tbee.javafx.scene.layout.MigPane
 import javafx.scene.control.Label
 import javafx.scene.control.Button
+import org.eclipse.xtend.lib.annotations.Accessors
 
-abstract class MutationForm<T> extends MigPane {
+@Accessors abstract class MutationForm<T> extends MigPane {
 
 	val List<Runnable> onChangedListeners = new ArrayList()
 	val compileMutationError = new SimpleStringProperty()

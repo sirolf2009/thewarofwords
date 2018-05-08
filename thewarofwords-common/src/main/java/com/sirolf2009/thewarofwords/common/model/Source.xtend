@@ -21,6 +21,9 @@ import com.sirolf2009.objectchain.common.interfaces.IHashable
 		if(sourceType == SourceType.TWEET && !source.host.equals("twitter.com")) {
 			throw new SourceVerificationException("SourceType is a tweet, but does not come from twitter", this)
 		}
+		if(sourceType == SourceType.TRUSTED && !(source.host.equals("nature.com") || source.host.equals("sciencemag.org") || source.host.equals("humanprogress.org"))) {
+			throw new SourceVerificationException("SourceType is trusted, but does not come from a trusted source", this)
+		}
 	}
 	
 	override verifyBytes(Kryo kryo) throws VerificationException {
