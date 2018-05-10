@@ -36,7 +36,7 @@ class Home extends VBox {
 		val recentOverview = new TopicsOverview(controller, controller.getFacade().getTopics().stream().limit(10).collect(Collectors.toList()))
 		recentTopics.getChildren.add(recentOverview)
 		recentOverview.maximize()
-		val creditOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).map[controller.getFacade().getCredit(it)].reduce[a,b|a+b]].reverse().stream().limit(10).collect(Collectors.toList()))
+		val creditOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).map[controller.getFacade().getCredit(it)].stream().reduce[a,b|a+b].orElse(0d)].reverse().stream().limit(10).collect(Collectors.toList()))
 		creditTopics.getChildren.add(creditOverview)
 		creditOverview.maximize()
 		val sourceOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).size()].reverse().stream().limit(10).collect(Collectors.toList()))

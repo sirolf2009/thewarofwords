@@ -56,6 +56,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			 «IF !tags.empty»
 			 	:topic/tags [«tags.map['''"«it»"'''].join(" ")»]
 			 «ENDIF»
+			 :topic/image "«getImage().toExternalForm()»"
 			 }'''
 		].toList()
 
@@ -105,7 +106,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		log.trace("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
 		log.trace("new block: {}", execute(#[blockQuery]))
 
-		val creditsQuery = upvotes.map [ mutation |
+		upvotes.forEach [ mutation |
 			val upvote = mutation.object as Upvote
 			val query = '''
 			[:find [?e ...]
@@ -115,12 +116,11 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			val source = sourceOpt.get()
 			val credit = getCredit(new SavedUpvote(mutation.hash(kryo), upvote))
 			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
-			return '''
+			execute(#['''
 			{:account/key "«account.getKey().encoded.toHexString()»"
 			 :account/username "«account.getUsername()»"
-			 :account/credibility «account.getCredibility()»}'''
-		].toList()
-		log.trace("new credits: {}", execute(creditsQuery))
+			 :account/credibility «account.getCredibility()»}'''])
+		]
 
 		return new State(connection, connection.db, blockNumber + 1)
 	}
@@ -277,7 +277,8 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		val name = entity.get(":topic/name") as String
 		val description = entity.get(":topic/description") as String
 		val tags = entity.get(":topic/tags") as Set<String>
-		return new SavedTopic(hash, new Topic(name, description, tags))
+		val image = new URL(entity.get(":topic/image") as String)
+		return new SavedTopic(hash, new Topic(name, description, tags, image))
 	}
 
 	def protected parseUpvote(Object blockID) {

@@ -37,7 +37,7 @@ class TestUpvote {
 			sleep(3000)
 			node3.createNode(2345)
 
-			val topic = node1.submitMutation(new Topic("Test Topic", "desription", #["test", "topic"].toSet()))
+			val topic = node1.submitMutation(new Topic("Test Topic", "desription", #["test", "topic"].toSet(), new URL("http://www.thewarofwords.com")))
 			val source = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "All you're base are belong to us"))
 
 			node2.awaitNewBlock()

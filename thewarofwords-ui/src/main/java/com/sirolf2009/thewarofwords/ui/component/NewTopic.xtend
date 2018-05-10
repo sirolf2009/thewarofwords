@@ -7,12 +7,15 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
+import java.net.URL
+import java.net.MalformedURLException
 
 class NewTopic extends MutationForm<Topic> {
 
 	val name = new SimpleStringProperty()
 	val desc = new SimpleStringProperty()
 	val tags = new SimpleStringProperty()
+	val url = new SimpleStringProperty()
 
 	new(MainController controller, Consumer<Topic> onSubmitted) {
 		super(controller)
@@ -33,6 +36,21 @@ class NewTopic extends MutationForm<Topic> {
 			desc.bind(textProperty())
 			textProperty().addListener[notifyChanged()]
 		], "growx, wrap, spanx 2")
+		add(new Label("Image"), "wrap")
+		add(new TextField() => [
+			url.bind(textProperty())
+			textProperty().addListener[notifyChanged()]
+			textProperty().addListener[obs,oldVal,newVal|
+				try {
+					new URL(newVal)
+					styleClass -= "error"
+				} catch(MalformedURLException e) {
+					if(!styleClass.contains("error")) {
+						styleClass += "error"
+					}
+				}
+			]
+		], "growx, wrap")
 		addFooter(onSubmitted)
 	}
 	
@@ -41,7 +59,7 @@ class NewTopic extends MutationForm<Topic> {
 	}
 	
 	def getTopic() {
-		return new Topic(name.get(), desc.get(), tags.get().split(",").map[trim()].toSet())
+		return new Topic(name.get(), desc.get(), tags.get().split(",").map[trim()].toSet(), new URL(url.getValue()))
 	}
 
 }

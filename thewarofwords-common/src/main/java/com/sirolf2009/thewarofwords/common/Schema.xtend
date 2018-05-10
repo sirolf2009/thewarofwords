@@ -63,8 +63,12 @@ class Schema {
  {:db/ident :topic/description
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one}
-  
+    
  {:db/ident :topic/tags
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/many}
+      
+ {:db/ident :topic/image
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/many}
   		  

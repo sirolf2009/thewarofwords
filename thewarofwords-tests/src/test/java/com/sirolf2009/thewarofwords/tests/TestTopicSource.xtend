@@ -34,7 +34,7 @@ class TestTopicSource {
 			miner.createMiner()
 			sleep(2000)
 
-			node1.submitMutation(new Topic("Test Topic", "description", #["test", "topic"].toSet()))
+			node1.submitMutation(new Topic("Test Topic", "description", #["test", "topic"].toSet(), new URL("http://www.thewarofwords.com")))
 			node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "All you're base are belong to us"))
 
 			node2.awaitNewBlock()

@@ -24,7 +24,7 @@
 			<tabs>
 				<Tab closable="false" text="News">
 					<content>
-						<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER">
+						<ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER">
 							<content>
 								<VBox>
 									<children>

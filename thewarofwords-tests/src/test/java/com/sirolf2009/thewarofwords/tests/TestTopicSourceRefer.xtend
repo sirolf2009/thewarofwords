@@ -35,11 +35,11 @@ class TestTopicSourceRefer {
 			miner.createMiner()
 			sleep(2000)
 
-			val genericProject = node1.submitMutation(new Topic("Generic Projects", "description", #["generic", "projects"].toSet()))
+			val genericProject = node1.submitMutation(new Topic("Generic Projects", "description", #["generic", "projects"].toSet(), new URL("http://www.thewarofwords.com")))
 			val genericSource = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/objectchain"), "This allows you to do a lot!"))
 			node1.submitMutation(new Reference(node1.get().hash(genericProject), node1.get().hash(genericSource)))
 
-			val specificProject = node1.submitMutation(new Topic("Practical Projects", "description", #["practical", "projects"].toSet()))
+			val specificProject = node1.submitMutation(new Topic("Practical Projects", "description", #["practical", "projects"].toSet(), new URL("http://www.thewarofwords.com")))
 			val specificSource = node1.submitMutation(new Source(SourceType.ARTICLE, new URL("https://github.com/sirolf2009/thewarofwords"), "This allows you to do one thing very easily!"))
 
 			node2.awaitNewBlock()

@@ -51,7 +51,7 @@ class TestState {
 	@Test
 	def void testAddTopic() {
 		val state = emptyState()
-		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet()), kryo(), Keys.generateAssymetricPair())
+		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet(), new URL("http://www.thewarofwords.com")), kryo(), Keys.generateAssymetricPair())
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet(#[topic]))
 		val newState = state.apply(kryo(), block) as State
 		assertFalse(newState.getTopics().empty)
@@ -94,7 +94,7 @@ class TestState {
 	def void testRefer() {
 		val state = emptyState()
 		val keys = Keys.generateAssymetricPair()
-		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet()), kryo(), keys)
+		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet(), new URL("http://www.thewarofwords.com")), kryo(), keys)
 		val source = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009/thewarofwords"), "comment"), kryo(), keys)
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet() => [
 			addAll(topic, source)
@@ -108,7 +108,7 @@ class TestState {
 	def void testUpvote() {
 		val state = emptyState()
 		val keys = Keys.generateAssymetricPair()
-		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet()), kryo(), keys)
+		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet(), new URL("http://www.thewarofwords.com")), kryo(), keys)
 		val source1 = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009/thewarofwords"), "comment"), kryo(), keys)
 		val source2 = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009"), "comment"), kryo(), keys)
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet() => [
