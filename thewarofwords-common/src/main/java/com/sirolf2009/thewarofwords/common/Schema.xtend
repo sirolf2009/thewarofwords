@@ -70,7 +70,7 @@ class Schema {
       
  {:db/ident :topic/image
   :db/valueType :db.type/string
-  :db/cardinality :db.cardinality/many}
+  :db/cardinality :db.cardinality/one}
   		  
  {:db/ident :topic/refers
   :db/valueType :db.type/string

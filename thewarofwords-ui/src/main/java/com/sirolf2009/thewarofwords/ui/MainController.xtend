@@ -9,7 +9,6 @@ import com.sirolf2009.thewarofwords.ui.component.Home
 import com.sirolf2009.thewarofwords.ui.component.NewSource
 import com.sirolf2009.thewarofwords.ui.component.NewTopic
 import com.sirolf2009.thewarofwords.ui.component.TopicOverview
-import com.sirolf2009.thewarofwords.ui.component.TopicsOverview
 import java.io.File
 import java.net.InetSocketAddress
 import java.nio.file.Files
@@ -93,7 +92,7 @@ class MainController {
 	}
 
 	def loadTopics() {
-		setNewsContent(new TopicsOverview(this, facade.getTopics))
+		setNewsContent(new Home(this))
 	}
 
 	def newSource(SavedTopic topic) {

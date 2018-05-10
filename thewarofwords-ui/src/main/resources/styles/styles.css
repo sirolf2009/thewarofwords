@@ -65,7 +65,7 @@
 	-fx-font-weight: bold;
 }
 
-.topicOverview > .title {
+.topicOverview .title {
 	-fx-font-size: 4em;
 	-fx-background-color: #0b3954;
 	-fx-text-fill: #ff6663;

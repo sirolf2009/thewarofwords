@@ -36,7 +36,7 @@ class NewTopic extends MutationForm<Topic> {
 			desc.bind(textProperty())
 			textProperty().addListener[notifyChanged()]
 		], "growx, wrap, spanx 2")
-		add(new Label("Image"), "wrap")
+		add(new Label("Image"), "growx, wrap, spanx 2")
 		add(new TextField() => [
 			url.bind(textProperty())
 			textProperty().addListener[notifyChanged()]
@@ -50,7 +50,7 @@ class NewTopic extends MutationForm<Topic> {
 					}
 				}
 			]
-		], "growx, wrap")
+		], "growx, wrap, spanx 2")
 		addFooter(onSubmitted)
 	}
 	

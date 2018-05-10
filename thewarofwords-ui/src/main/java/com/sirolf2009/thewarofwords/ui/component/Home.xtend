@@ -6,11 +6,11 @@ import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Rectangle2D
 import javafx.scene.Node
+import javafx.scene.control.ScrollPane
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.VBox
 
-class Home extends VBox {
+class Home extends ScrollPane {
 	
 	val MainController controller
 	@FXML ImageView bannerImg

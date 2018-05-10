@@ -14,8 +14,11 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.tbee.javafx.scene.layout.MigPane
+import javafx.scene.control.Separator
+import javafx.geometry.Orientation
 
 class TopicOverview extends MigPane {
 
@@ -28,16 +31,22 @@ class TopicOverview extends MigPane {
 	new(MainController controller, SavedTopic topic) {
 		super("fillx")
 		styleClass += #["newsContentItem", "topicOverview"]
-		add(new Label(topic.getTopic().getName()) => [
-			styleClass += "title"
-			alignment = Pos.CENTER
+		add(new StackPane() => [
+			style = '''-fx-background-image: url("«topic.getTopic().getImage().toExternalForm()»");-fx-background-repeat: stretch; -fx-background-position: center ;'''
+			prefHeight = 300
+			children.add(new Label(topic.getTopic().getName()) => [
+				styleClass += "title"
+				alignment = Pos.CENTER
+			])
 		], "span, wrap, growx")
+		add(new Separator(Orientation.HORIZONTAL), "span, wrap, growx")
 		add(new Label(topic.getTopic().getDescription()) => [
 			styleClass += "description"
 		], "span 2, growx")
 		add(new Button("Add source") => [
 			onAction = [controller.newSource(topic)]
 		], "wrap, right")
+		add(new Separator(Orientation.HORIZONTAL), "span, wrap, growx")
 		add(sourcesContainer, "span, grow")
 
 		controller.getFacade().getSources(topic.getHash()).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [ source |
