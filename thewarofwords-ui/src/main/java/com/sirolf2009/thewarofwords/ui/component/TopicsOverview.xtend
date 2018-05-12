@@ -11,9 +11,9 @@ class TopicsOverview extends FlowPane {
 
 	new(MainController controller, List<SavedTopic> topics) {
 		alignment = Pos.CENTER
+		margin = new Insets(4)
 		topics.forEach [ topic |
 			getChildren().add(new TopicCard(topic.getTopic()) => [
-				margin = new Insets(4)
 				onMouseClicked = [
 					controller.showTopic(topic)
 				]

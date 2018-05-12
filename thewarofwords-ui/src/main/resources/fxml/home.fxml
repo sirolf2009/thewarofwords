@@ -9,10 +9,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.VBox?>
 
-
 <fx:root fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" type="ScrollPane" vbarPolicy="ALWAYS" xmlns="http://javafx.com/javafx/8.0.172" xmlns:fx="http://javafx.com/fxml/1">
    <content>
-      <javafx.scene.layout.VBox maxHeight="1.7976931348623157E308" prefHeight="300.0" styleClass="home" stylesheets="@../styles/styles.css">
+      <javafx.scene.layout.VBox maxHeight="1.7976931348623157E308" styleClass="home" stylesheets="@../styles/styles.css">
          <children>
             <StackPane>
                <children>
@@ -35,58 +34,63 @@
                   </Label>
                </children>
             </StackPane>
-            <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <VBox spacing="12.0" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                  <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                      <children>
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Recent" />
-                        <Separator prefWidth="200.0" />
-                        <AnchorPane fx:id="recentTopics" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Recent" />
+                              <Separator prefWidth="200.0" />
+                              <AnchorPane fx:id="recentTopics" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                 <padding>
+                                    <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                 </padding>
+                                 <VBox.margin>
+                                    <Insets bottom="32.0" left="16.0" right="16.0" top="32.0" />
+                                 </VBox.margin>
+                              </AnchorPane>
+                           </children>
+                        </VBox>
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Most Credit" textAlignment="CENTER" />
+                              <Separator prefWidth="200.0" />
+                              <AnchorPane fx:id="creditTopics" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Most sources" />
+                              <Separator prefWidth="200.0" />
+                              <AnchorPane fx:id="sourceTopics" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
                      </children>
-                  </VBox>
-                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                  </HBox>
+                  <HBox>
                      <children>
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Most Credit" textAlignment="CENTER" />
-                        <Separator prefWidth="200.0" />
-                        <AnchorPane fx:id="creditTopics" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
+                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="category-title" text="Recent Upvotes" />
+                              <Separator prefWidth="200.0" />
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Subscribed Topics" textAlignment="CENTER" />
+                              <Separator prefWidth="200.0" />
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                           </children>
+                        </VBox>
                      </children>
-                  </VBox>
-                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Most sources" />
-                        <Separator prefWidth="200.0" />
-                        <AnchorPane fx:id="sourceTopics" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
+                  </HBox>
                </children>
                <padding>
-                  <Insets left="16.0" right="16.0" top="16.0" />
+                  <Insets left="16.0" right="32.0" />
                </padding>
-            </HBox>
-            <HBox>
-               <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label styleClass="category-title" text="Recent Upvotes" />
-                        <Separator prefWidth="200.0" />
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0" />
-                     </children>
-                     <padding>
-                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-                     </padding>
-                  </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Subscribed Topics" textAlignment="CENTER" />
-                        <Separator prefWidth="200.0" />
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0" />
-                     </children>
-                     <padding>
-                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-                     </padding>
-                  </VBox>
-               </children>
-            </HBox>
+            </VBox>
          </children>
       </javafx.scene.layout.VBox>
    </content>
