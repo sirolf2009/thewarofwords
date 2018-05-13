@@ -1,6 +1,7 @@
 package com.sirolf2009.thewarofwords.ui
 
 import com.dooapp.fxform.FXForm
+import com.dooapp.fxform.view.FXFormSkinFactory
 import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.Source
@@ -48,7 +49,7 @@ class MainController {
 
 	@FXML
 	def void initialize() {
-		node = new UINode(settings, #[new InetSocketAddress("thewarofwords.com", 2012)], 4567, getKeys())
+		node = new UINode(settings, #[new InetSocketAddress(settings.getTrackerIP().getValue(), settings.getTrackerPort().getValue())], settings.getHostPort().getValue(), getKeys())
 		facade = new TheWarOfWordsFacade(node)
 		new Thread[node.start()] => [
 			daemon = true
@@ -58,13 +59,14 @@ class MainController {
 		node.getIsSynchronised().addListener [
 			if(node.getIsSynchronised().get()) {
 				Platform.runLater [
-//					loadTopics()
-					newsContent = new Home(this)
+					loadTopics()
 				]
 			}
 		]
 
-		settingsTab.setContent(new FXForm(settings))
+		settingsTab.setContent(new FXForm(settings) => [
+			setSkin(FXFormSkinFactory.INLINE_FACTORY.createSkin(it))
+		])
 
 		popButton.disableProperty().bind(Bindings.lessThan(Bindings.size(newsContent.getChildren()), 2))
 

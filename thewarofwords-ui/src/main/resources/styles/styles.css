@@ -111,3 +111,26 @@
 	-fx-font-size: 1.1em;
 	-fx-font-weight: bold;
 }
+
+.form-label {
+    -fx-font-size: 20;
+    -fx-text-fill: #0d1321;
+}
+
+.form-editor {
+    -fx-font-size: 20;
+}
+
+.form-title {
+    -fx-font-size: 20;
+    -fx-text-fill: #0d1321;
+}
+
+.form-tooltip {
+    -fx-font-size: 11;
+}
+
+.form-constraint .label {
+    -fx-font-size: 20;
+    -fx-text-fill: red;
+}

@@ -3,6 +3,7 @@ package com.sirolf2009.thewarofwords.ui
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Connection
 import com.sirolf2009.objectchain.common.model.Hash
+import com.sirolf2009.thewarofwords.common.State
 import com.sirolf2009.thewarofwords.node.TheWarOfWordsNode
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
@@ -13,9 +14,11 @@ import java.util.concurrent.Executors
 import java.util.logging.Level
 import javafx.application.Platform
 import javafx.beans.property.BooleanProperty
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import org.apache.logging.log4j.LogManager
@@ -27,9 +30,6 @@ import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.protocol.RetrieveRemoteDescriptors
 import org.fourthline.cling.support.igd.PortMappingListener
 import org.fourthline.cling.support.model.PortMapping
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleDoubleProperty
-import com.sirolf2009.thewarofwords.common.State
 
 @Accessors class UINode extends TheWarOfWordsNode {
 
