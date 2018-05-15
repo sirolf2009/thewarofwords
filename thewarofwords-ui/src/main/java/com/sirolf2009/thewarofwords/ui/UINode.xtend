@@ -30,20 +30,29 @@ import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.protocol.RetrieveRemoteDescriptors
 import org.fourthline.cling.support.igd.PortMappingListener
 import org.fourthline.cling.support.model.PortMapping
+import com.sirolf2009.thewarofwords.common.model.Reference
+import com.sirolf2009.thewarofwords.ui.model.Subscription
+import org.controlsfx.control.Notifications
+import org.controlsfx.control.action.Action
+import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 
 @Accessors class UINode extends TheWarOfWordsNode {
 
 	private static final Logger log = LogManager.logger
 
 	val List<UpnpService> upnpServices = new ArrayList()
+	val MainController controller
+	val Settings settings
 	val BooleanProperty isConnected
 	val BooleanProperty isSynchronised
 	val ObjectProperty<Hash> lastBlock
 	val IntegerProperty nodes
 	val DoubleProperty credibility
 
-	new(Settings settings, List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
+	new(MainController controller, List<InetSocketAddress> trackers, int nodePort, KeyPair keys) {
 		super(trackers, nodePort, keys)
+		this.controller = controller
+		settings = controller.getSettings()
 		isConnected = new SimpleBooleanProperty(false)
 		isSynchronised = new SimpleBooleanProperty(false)
 		lastBlock = new SimpleObjectProperty()
@@ -80,8 +89,24 @@ import org.fourthline.cling.support.model.PortMapping
 	}
 
 	override onBlockchainExpanded() {
+		val block = blockchain.mainBranch.getLastBlock()
+		val hash = hash(block)
+		block.getMutations().map[getObject()].forEach[
+			if(it instanceof Reference) {
+				val topic = getTopic()
+				settings.getSubscriptions().filter[getTopicHash().equals(topic)].toList().forEach[
+					settings.getSubscriptions().remove(it)
+					settings.getSubscriptions().add(new Subscription(getTopicHash(), hash))
+					
+					val state = blockchain.mainBranch.lastState as State
+					state.getTopic(getTopicHash()).ifPresent[
+						Notifications.create().title(getTopic().getName()).text("New source has been submitted").action(new Action("Show", [evt|controller.setNewsContent(new TopicOverview(controller, it))])).show()
+					]
+				]
+			}
+		]
 		Platform.runLater [
-			lastBlock.set(hash(blockchain.mainBranch.getLastBlock()))
+			lastBlock.set(hash)
 			credibility.set((blockchain.mainBranch.getLastState() as State).getAccount(getKeys().public).map[it.getCredibility()].orElse(0d))
 		]
 	}

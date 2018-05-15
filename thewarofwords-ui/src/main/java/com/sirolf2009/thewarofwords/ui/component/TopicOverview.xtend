@@ -5,20 +5,23 @@ import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.ui.MainController
 import java.util.ArrayList
 import java.util.LinkedList
+import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.collections.FXCollections
 import javafx.geometry.Insets
+import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.Separator
+import javafx.scene.control.ToggleButton
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.tbee.javafx.scene.layout.MigPane
-import javafx.scene.control.Separator
-import javafx.geometry.Orientation
+import com.sirolf2009.thewarofwords.ui.model.Subscription
 
 class TopicOverview extends MigPane {
 
@@ -43,8 +46,20 @@ class TopicOverview extends MigPane {
 		add(new Label(topic.getTopic().getDescription()) => [
 			styleClass += "description"
 		], "span 2, growx")
-		add(new Button("Add source") => [
-			onAction = [controller.newSource(topic)]
+		add(new HBox(8) => [
+			getChildren().add(new ToggleButton("Subscribe") => [
+				textProperty().bind(Bindings.when(selectedProperty()).then("Subscribed").otherwise("Subscribe"))
+				selectedProperty().addListener [evt|
+					if(isSelected()) {
+						controller.getSettings().getSubscriptions().add(new Subscription(topic.getHash(), controller.getNode().getLastBlock().get()))
+					} else {
+						controller.getSettings().getSubscriptions().removeAll(controller.getSettings().getSubscriptions().filter[getTopicHash().equals(topic.getHash())])
+					}
+				]
+			])
+			getChildren().add(new Button("Add source") => [
+				onAction = [controller.newSource(topic)]
+			])
 		], "wrap, right")
 		add(new Separator(Orientation.HORIZONTAL), "span, wrap, growx")
 		add(sourcesContainer, "span, grow")

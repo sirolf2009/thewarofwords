@@ -18,6 +18,7 @@ import java.security.KeyPair
 import java.util.concurrent.Executors
 import javafx.animation.TranslateTransition
 import javafx.application.Platform
+import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.concurrent.Task
@@ -29,17 +30,16 @@ import javafx.scene.control.Tab
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.StackPane
 import javafx.util.Duration
+import org.apache.commons.beanutils.PropertyUtils
 import org.apache.logging.log4j.LogManager
 import org.eclipse.xtend.lib.annotations.Accessors
-import javafx.beans.Observable
-import org.apache.commons.beanutils.PropertyUtils
 
 class MainController {
 
 	static val log = LogManager.logger
 	static val settingsFile = new File("settings.toml")
 	val executor = Executors.newWorkStealingPool()
-	val settings = persistSettingsChanges(readSettings())
+	@Accessors val settings = persistSettingsChanges(readSettings())
 	@Accessors var UINode node
 	@Accessors var TheWarOfWordsFacade facade
 	@FXML var Button popButton
@@ -52,7 +52,7 @@ class MainController {
 
 	@FXML
 	def void initialize() {
-		node = new UINode(settings, #[new InetSocketAddress(settings.getTrackerIP().getValue(), settings.getTrackerPort().getValue())], settings.getHostPort().getValue(), getKeys())
+		node = new UINode(this, #[new InetSocketAddress(settings.getTrackerIP().getValue(), settings.getTrackerPort().getValue())], settings.getHostPort().getValue(), getKeys())
 		facade = new TheWarOfWordsFacade(node)
 		new Thread[node.start()] => [
 			daemon = true
@@ -141,7 +141,7 @@ class MainController {
 			play()
 		]
 	}
-	
+
 	def static readSettings() {
 		if(settingsFile.exists()) {
 			return Settings.read(settingsFile)
@@ -151,10 +151,10 @@ class MainController {
 			return settings
 		}
 	}
-	
+
 	def static persistSettingsChanges(Settings settings) {
-		Settings.getDeclaredFields().filter[Observable.isAssignableFrom(getType())].forEach[
-			(PropertyUtils.getProperty(settings, getName()) as Observable).addListener[
+		Settings.getDeclaredFields().filter[Observable.isAssignableFrom(getType())].forEach [
+			(PropertyUtils.getProperty(settings, getName()) as Observable).addListener [
 				settings.write(settingsFile)
 			]
 		]

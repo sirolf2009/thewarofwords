@@ -179,6 +179,12 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		 :where [?e topic/hash _]]''')
 		response.map [parseTopic(it)].toList()
 	}
+	
+	def getTopic(Hash topicHash) {
+		queryVector('''
+		[:find [?e ...]
+		 :where [?e topic/hash "«topicHash»"]]''').stream().map[parseTopic()].findFirst()
+	}
 
 	def getBlocknumberForTopic(Hash topicHash) {
 		queryVector('''
