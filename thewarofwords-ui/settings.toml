@@ -1,0 +1,4 @@
+hostPort = 4567
+trackerIP = "thewarofwords.com"
+trackerPort = 2012
+useUpnp = true

@@ -31,12 +31,15 @@ import javafx.scene.layout.StackPane
 import javafx.util.Duration
 import org.apache.logging.log4j.LogManager
 import org.eclipse.xtend.lib.annotations.Accessors
+import javafx.beans.Observable
+import org.apache.commons.beanutils.PropertyUtils
 
 class MainController {
 
 	static val log = LogManager.logger
+	static val settingsFile = new File("settings.toml")
 	val executor = Executors.newWorkStealingPool()
-	val settings = new Settings()
+	val settings = persistSettingsChanges(readSettings())
 	@Accessors var UINode node
 	@Accessors var TheWarOfWordsFacade facade
 	@FXML var Button popButton
@@ -137,6 +140,25 @@ class MainController {
 			toX = 0
 			play()
 		]
+	}
+	
+	def static readSettings() {
+		if(settingsFile.exists()) {
+			return Settings.read(settingsFile)
+		} else {
+			val settings = new Settings()
+			settings.write(settingsFile)
+			return settings
+		}
+	}
+	
+	def static persistSettingsChanges(Settings settings) {
+		Settings.getDeclaredFields().filter[Observable.isAssignableFrom(getType())].forEach[
+			(PropertyUtils.getProperty(settings, getName()) as Observable).addListener[
+				settings.write(settingsFile)
+			]
+		]
+		return settings
 	}
 
 	def static getKeys() {
