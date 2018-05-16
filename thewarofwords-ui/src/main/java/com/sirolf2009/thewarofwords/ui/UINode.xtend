@@ -91,15 +91,15 @@ import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 	override onBlockchainExpanded() {
 		val block = blockchain.mainBranch.getLastBlock()
 		val hash = hash(block)
-		val state = blockchain.mainBranch.getLastState() as State
 		block.getMutations().map[getObject()].forEach[
 			if(it instanceof Reference) {
 				val topic = getTopic()
 				settings.getSubscriptions().filter[getTopicHash().equals(topic)].toList().forEach[
 					settings.getSubscriptions().remove(it)
-					settings.getSubscriptions().add(new Subscription(getTopicHash(), state.getDatabase().basisT()))
+					settings.getSubscriptions().add(new Subscription(getTopicHash(), hash))
 					
-					state.getTopic(getTopicHash()).ifPresent[//TODO this will get the topic in the current state, we need to query the log to find if it actually changed
+					val state = blockchain.mainBranch.lastState as State
+					state.getTopic(getTopicHash()).ifPresent[
 						Notifications.create().title(getTopic().getName()).text("New source has been submitted").action(new Action("Show", [evt|controller.setNewsContent(new TopicOverview(controller, it))])).show()
 					]
 				]

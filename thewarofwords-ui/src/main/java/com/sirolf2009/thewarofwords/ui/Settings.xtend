@@ -35,7 +35,7 @@ import org.eclipse.xtend.lib.annotations.Data
 		settings.getTrackerPort().set(flat.getTrackerPort())
 		settings.getUseUpnp().set(flat.isUseUpnp())
 		Optional.ofNullable(flat.getSubscriptions()).ifPresent[
-			map[new Subscription(new Hash(getTopicHash()), getLastT())].forEach[
+			map[new Subscription(new Hash(getTopicHash()), new Hash(getLastUpdateBlock()))].forEach[
 				settings.getSubscriptions().add(it)
 			]
 		]
@@ -45,7 +45,7 @@ import org.eclipse.xtend.lib.annotations.Data
 	def void write(File file) {
 		val out = new FileOutputStream(file)
 		val writer = new TomlWriter()
-		writer.write(new Simple(hostPort.get(), trackerIP.get(), trackerPort.get(), useUpnp.get(), subscriptions.map[new SubscriptionFlat(getTopicHash().toString(), getLastT())].toArray(newArrayOfSize(subscriptions.size()))), out)
+		writer.write(new Simple(hostPort.get(), trackerIP.get(), trackerPort.get(), useUpnp.get(), subscriptions.map[new SubscriptionFlat(getTopicHash().toString(), getLastUpdateBlock().toString())].toArray(newArrayOfSize(subscriptions.size()))), out)
 		out.close()
 	}
 	
@@ -70,14 +70,14 @@ import org.eclipse.xtend.lib.annotations.Data
 	
 	@Accessors static class SubscriptionFlat {
 		String topicHash
-		Long lastT
+		String lastUpdateBlock
 		
 		new() {
 		}
 		
-		new(String topicHash, Long lastT) {
+		new(String topicHash, String lastUpdateBlock) {
 			this.topicHash = topicHash
-			this.lastT = lastT
+			this.lastUpdateBlock = lastUpdateBlock
 		}
 	}
 	

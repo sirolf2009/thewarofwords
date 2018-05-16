@@ -105,7 +105,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		log.trace("new topics and sources: {}", execute(topicsQuery + sourcesQuery))
 		log.trace("new references and upvotes: {}", execute(referencesQuery + upvotesQuery))
 		log.trace("new block: {}", execute(#[blockQuery]))
-		
+
 		upvotes.forEach [ mutation |
 			val upvote = mutation.object as Upvote
 			val query = '''
@@ -121,7 +121,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			 :account/username "«account.getUsername()»"
 			 :account/credibility «account.getCredibility()»}'''])
 		]
-		
+
 		return new State(connection, connection.db, blockNumber + 1)
 	}
 	
@@ -145,7 +145,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			case ARTICLE: 40
 			case TWEET: 20
 		} * getAccount(upvote.getUpvote().getVoter()).map[1 + credibility / 100].orElse(1d)
-		//TODO when in prod, a certain amount of credibility must already be assigned to the voter before credit counts
+		//TODO when in prod, a certain amount of credibility must already be assigned before credit counts
 	}
 
 	override toString() {
