@@ -24,6 +24,18 @@ class TheWarOfWordsFacade {
 		this.node = node
 	}
 	
+	def getBlock(int number) {
+		return state.getBlock(number)
+	}
+	
+	def getBlockNumberForSource(Hash sourceHash) {
+		return state.getBlocknumberForSource(sourceHash)
+	}
+	
+	def getSourcesForTopicSince(Hash topicHash, long since) {
+		return state.getSourcesForTopicSince(topicHash, since)
+	}
+	
 	def getTopics() {
 		return state.getTopics()
 	}

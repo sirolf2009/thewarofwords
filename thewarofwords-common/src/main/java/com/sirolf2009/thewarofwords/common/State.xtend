@@ -173,11 +173,21 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		return lastTx.get()
 	}
 
-	def getTopics() {
-		val response = queryVector('''
+	def getSourcesForTopicSince(Hash topicHash, long since) {
+		queryVector('''
 		[:find [?e ...]
-		 :where [?e topic/hash _]]''')
-		response.map [parseTopic(it)].toList()
+		 :where [?t topic/hash "«topicHash»"]
+		        [?t topic/refers ?e]
+		        [?b block/added-sources ?e]
+		        [?b block/time ?m]
+		        [(< ?m «since»)]]
+		        ''').map [parseSource(it)].toList()
+	}
+
+	def getTopics() {
+		queryVector('''
+		[:find [?e ...]
+		 :where [?e topic/hash _]]''').map [parseTopic(it)].toList()
 	}
 	
 	def getTopic(Hash topicHash) {
@@ -199,7 +209,14 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?b ...]
 			 :where [?block block/added-sources "«sourceHash»"]
 			 		[?block block/number ?b]]
-		''').get(0)
+		''').get(0) as Integer
+	}
+
+	def getBlock(int number) {
+		parseBlock(queryVector('''
+			[:find [?b ...]
+			 :where [?block block/number «number»]]
+		''').get(0))
 	}
 
 	def hasUpvoted(PublicKey key, Hash source, Hash topic) {

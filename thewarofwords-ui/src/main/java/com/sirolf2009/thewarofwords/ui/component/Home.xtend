@@ -9,6 +9,7 @@ import javafx.scene.Node
 import javafx.scene.control.ScrollPane
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
+import java.time.Duration
 
 class Home extends ScrollPane {
 	
@@ -42,6 +43,9 @@ class Home extends ScrollPane {
 		val sourceOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).size()].reverse().stream().limit(10).collect(Collectors.toList()))
 		sourceTopics.getChildren.add(sourceOverview)
 		sourceOverview.maximize()
+		val a = controller.getSettings().getSubscriptions().map[controller.getFacade().getSourcesForTopicSince(getTopicHash(), System.currentTimeMillis()-Duration.ofDays(7).toMillis())].map[
+			map[controller.getFacade().getBlock(controller.getFacade().getBlockNumberForSource(getHash()))] //TODO SavedBlock 
+		]
 	}
 	
 	def void maximize(Node node) {
