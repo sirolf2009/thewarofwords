@@ -1,5 +1,7 @@
 package com.sirolf2009.thewarofwords
 
+import clojure.lang.Keyword
+import clojure.lang.PersistentVector
 import com.sirolf2009.objectchain.common.crypto.Keys
 import com.sirolf2009.objectchain.common.model.Block
 import com.sirolf2009.objectchain.common.model.BlockHeader
@@ -11,6 +13,7 @@ import com.sirolf2009.thewarofwords.common.model.Reference
 import com.sirolf2009.thewarofwords.common.model.Source
 import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
+import com.sirolf2009.thewarofwords.common.model.Upvote
 import datomic.Peer
 import java.math.BigInteger
 import java.net.URL
@@ -21,7 +24,7 @@ import org.junit.Test
 
 import static com.sirolf2009.thewarofwords.common.TheWarOfWordsKryo.*
 import static junit.framework.Assert.*
-import com.sirolf2009.thewarofwords.common.model.Upvote
+import datomic.db.Datum
 
 class TestState {
 

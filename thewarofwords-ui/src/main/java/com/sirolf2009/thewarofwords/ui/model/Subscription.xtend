@@ -6,6 +6,6 @@ import org.eclipse.xtend.lib.annotations.Data
 @Data class Subscription {
 	
 	val Hash topicHash
-	val Hash lastUpdateBlock
+	val Long lastT
 	
 }

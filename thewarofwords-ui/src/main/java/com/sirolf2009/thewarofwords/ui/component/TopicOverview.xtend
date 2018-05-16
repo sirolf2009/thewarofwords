@@ -22,6 +22,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.tbee.javafx.scene.layout.MigPane
 import com.sirolf2009.thewarofwords.ui.model.Subscription
+import com.sirolf2009.thewarofwords.common.State
 
 class TopicOverview extends MigPane {
 
@@ -51,7 +52,8 @@ class TopicOverview extends MigPane {
 				textProperty().bind(Bindings.when(selectedProperty()).then("Subscribed").otherwise("Subscribe"))
 				selectedProperty().addListener [evt|
 					if(isSelected()) {
-						controller.getSettings().getSubscriptions().add(new Subscription(topic.getHash(), controller.getNode().getLastBlock().get()))
+						val state = controller.getNode().getBlockchain().getMainBranch().getLastState() as State
+						controller.getSettings().getSubscriptions().add(new Subscription(topic.getHash(), state.getDatabase().basisT()))
 					} else {
 						controller.getSettings().getSubscriptions().removeAll(controller.getSettings().getSubscriptions().filter[getTopicHash().equals(topic.getHash())])
 					}
