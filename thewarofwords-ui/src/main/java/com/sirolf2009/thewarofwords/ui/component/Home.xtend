@@ -1,6 +1,11 @@
 package com.sirolf2009.thewarofwords.ui.component
 
+import com.sirolf2009.thewarofwords.common.model.SavedSource
+import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.ui.MainController
+import com.sirolf2009.thewarofwords.ui.model.Subscription
+import java.time.Duration
+import java.util.Date
 import java.util.stream.Collectors
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -9,7 +14,7 @@ import javafx.scene.Node
 import javafx.scene.control.ScrollPane
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
-import java.time.Duration
+import org.eclipse.xtend.lib.annotations.Data
 
 class Home extends ScrollPane {
 	
@@ -18,6 +23,8 @@ class Home extends ScrollPane {
 	@FXML AnchorPane recentTopics
 	@FXML AnchorPane creditTopics
 	@FXML AnchorPane sourceTopics
+	@FXML AnchorPane subscribedTopics
+	@FXML AnchorPane upvotedSources
 
 	new(MainController controller) {
 		this.controller = controller
@@ -43,9 +50,14 @@ class Home extends ScrollPane {
 		val sourceOverview = new TopicsOverview(controller, controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).size()].reverse().stream().limit(10).collect(Collectors.toList()))
 		sourceTopics.getChildren.add(sourceOverview)
 		sourceOverview.maximize()
-		val a = controller.getSettings().getSubscriptions().map[controller.getFacade().getSourcesForTopicSince(getTopicHash(), System.currentTimeMillis()-Duration.ofDays(7).toMillis())].map[
-			map[controller.getFacade().getBlock(controller.getFacade().getBlockNumberForSource(getHash()))] //TODO SavedBlock 
-		]
+		val subscribed = controller.getSettings().getSubscriptions().stream().map[it -> controller.getFacade().getSourcesForTopicSince(getTopicHash(), System.currentTimeMillis()-Duration.ofDays(7).toMillis())].filter[value.size() > 0].flatMap[
+			value.stream().map[source|
+				new SubscribedSource(key, controller.getFacade().getTopic(key.getTopicHash()).get(), source, controller.getFacade().getBlock(controller.getFacade().getBlockNumberForSource(source.getHash())).getTimestamp())
+			] 
+		].sorted[a,b| a.getTimestamp().compareTo(b.getTimestamp())].map[topic].distinct().limit(10).collect(Collectors.toList())
+		val subscriptionOverview = new TopicsOverview(controller, subscribed)
+		subscribedTopics.getChildren.add(subscriptionOverview)
+		subscriptionOverview.maximize()
 	}
 	
 	def void maximize(Node node) {
@@ -53,6 +65,13 @@ class Home extends ScrollPane {
 		AnchorPane.setRightAnchor(node, 0d)
 		AnchorPane.setBottomAnchor(node, 0d)
 		AnchorPane.setLeftAnchor(node, 0d)
+	}
+	
+	@Data static class SubscribedSource {
+		val Subscription subscription
+		val SavedTopic topic
+		val SavedSource source
+		val Date timestamp
 	}
 
 }

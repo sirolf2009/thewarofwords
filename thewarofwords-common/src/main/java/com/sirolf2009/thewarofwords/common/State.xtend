@@ -9,6 +9,7 @@ import com.sirolf2009.objectchain.common.model.BlockHeader
 import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.Account
 import com.sirolf2009.thewarofwords.common.model.Reference
+import com.sirolf2009.thewarofwords.common.model.SavedBlock
 import com.sirolf2009.thewarofwords.common.model.SavedSource
 import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.SavedUpvote
@@ -201,7 +202,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?b ...]
 			 :where [?block block/added-topics "«topicHash»"]
 			 		[?block block/number ?b]]
-		''').get(0)
+		''').get(0) as Long
 	}
 
 	def getBlocknumberForSource(Hash sourceHash) {
@@ -209,10 +210,10 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?b ...]
 			 :where [?block block/added-sources "«sourceHash»"]
 			 		[?block block/number ?b]]
-		''').get(0) as Integer
+		''').get(0) as Long
 	}
 
-	def getBlock(int number) {
+	def getBlock(long number) {
 		parseBlock(queryVector('''
 			[:find [?b ...]
 			 :where [?block block/number «number»]]
@@ -282,6 +283,9 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 	def protected parseBlock(Object blockID) {
 		val entity = database.entity(blockID)
+		val hash = new Hash(entity.get(":block/hash") as String)
+		val number = entity.get(":block/number") as Long
+		val timestamp = new Date(entity.get("block/time") as Long)
 		val previousBlock = entity.get(":block/previous-block") as String
 		val merkleroot = entity.get(":block/merkleroot") as String
 		val time = entity.get(":block/time") as Long
@@ -291,7 +295,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		val topics = entity.get(":block/added-topics") as Set<String>
 
 		val header = new BlockHeader(new Hash(previousBlock), new Hash(merkleroot), new Date(time), new BigInteger(target.toByteArray()), nonce.intValue())
-		return new Block(header, new TreeSet(#[sources.map[parseSource().getSource()], topics.map[parseTopic().getTopic()]]))
+		return new SavedBlock(hash, number, timestamp, new Block(header, new TreeSet(#[sources.map[parseSource().getSource()], topics.map[parseTopic().getTopic()]])))
 	}
 
 	def protected parseTopic(Object blockID) {

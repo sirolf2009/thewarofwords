@@ -74,14 +74,14 @@
                            <children>
                               <Label styleClass="category-title" text="Recent Upvotes" />
                               <Separator prefWidth="200.0" />
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                              <AnchorPane fx:id="upvotedSources" prefHeight="200.0" prefWidth="200.0" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" styleClass="category-title" text="Subscribed Topics" textAlignment="CENTER" />
                               <Separator prefWidth="200.0" />
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                              <AnchorPane fx:id="subscribedTopics" prefHeight="200.0" prefWidth="200.0" />
                            </children>
                         </VBox>
                      </children>

@@ -24,7 +24,7 @@ class TheWarOfWordsFacade {
 		this.node = node
 	}
 	
-	def getBlock(int number) {
+	def getBlock(long number) {
 		return state.getBlock(number)
 	}
 	
@@ -38,6 +38,10 @@ class TheWarOfWordsFacade {
 	
 	def getTopics() {
 		return state.getTopics()
+	}
+	
+	def getTopic(Hash topicHash) {
+		return state.getTopic(topicHash)
 	}
 	
 	def getSources() {
