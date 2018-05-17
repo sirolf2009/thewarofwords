@@ -2,19 +2,14 @@ package com.sirolf2009.thewarofwords.common
 
 import clojure.lang.PersistentVector
 import com.esotericsoftware.kryo.Kryo
-import com.sirolf2009.objectchain.common.crypto.CryptoHelper
 import com.sirolf2009.objectchain.common.interfaces.IState
 import com.sirolf2009.objectchain.common.model.Block
-import com.sirolf2009.objectchain.common.model.BlockHeader
 import com.sirolf2009.objectchain.common.model.Hash
 import com.sirolf2009.thewarofwords.common.model.Account
 import com.sirolf2009.thewarofwords.common.model.Reference
-import com.sirolf2009.thewarofwords.common.model.SavedBlock
 import com.sirolf2009.thewarofwords.common.model.SavedSource
-import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.common.model.SavedUpvote
 import com.sirolf2009.thewarofwords.common.model.Source
-import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.common.model.Topic
 import com.sirolf2009.thewarofwords.common.model.Upvote
 import datomic.Connection
@@ -22,18 +17,15 @@ import datomic.Database
 import datomic.Peer
 import datomic.Util
 import java.io.StringReader
-import java.math.BigInteger
-import java.net.URL
 import java.security.PublicKey
-import java.util.Date
 import java.util.HashSet
 import java.util.List
 import java.util.Map
-import java.util.Set
-import java.util.TreeSet
 import java.util.concurrent.atomic.AtomicReference
 import org.eclipse.xtend.lib.annotations.Data
 import org.slf4j.LoggerFactory
+
+import static extension com.sirolf2009.thewarofwords.common.datomic.ParseExtensions.*
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
@@ -113,9 +105,9 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?e ...]
 			 :where [?e source/hash "«upvote.sourceHash»"]]'''
 			val vector = queryVector(query, connection.db)
-			val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
+			val sourceOpt = vector.stream().map[parseSource(connection.db)].findFirst()
 			val source = sourceOpt.get()
-			val credit = getCredit(new SavedUpvote(mutation.hash(kryo), upvote))
+			val credit = getCredit(new SavedUpvote(mutation.hash(kryo), upvote), connection.db)
 			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
 			execute(#['''
 			{:account/key "«account.getKey().encoded.toHexString()»"
@@ -131,13 +123,17 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	}
 
 	def getCredit(SavedUpvote upvote) {
+		getCredit(upvote, database)
+	}
+
+	def getCredit(SavedUpvote upvote, Database database) {
 		val query = '''
 		[:find [?e ...]
 		 :where [?e source/hash "«upvote.getUpvote().getSourceHash()»"]
 		 		[?upvote upvote/source "«upvote.getUpvote().getSourceHash()»"]
 		 		[?upvote upvote/hash "«upvote.getHash()»"]]'''
-		val vector = queryVector(query, connection.db)
-		val sourceOpt = vector.stream().map[parseSource(it, connection.db)].findFirst()
+		val vector = queryVector(query, database)
+		val sourceOpt = vector.stream().map[parseSource(database)].findFirst()
 		val source = sourceOpt.orElseThrow[new RuntimeException("Could not find source accompanying "+upvote)]
 		return switch (source.getSource().getSourceType()) {
 			case TRUSTED: 100
@@ -156,7 +152,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	def getAccount(PublicKey account) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e account/key "«account.encoded.toHexString()»"]]''').stream().map[parseAccount()].findFirst()
+		 :where [?e account/key "«account.encoded.toHexString()»"]]''').stream().map[parseAccount(database)].findFirst()
 	}
 
 	def private execute(Iterable<String> queries) {
@@ -182,19 +178,19 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		        [?b block/added-sources ?e]
 		        [?b block/time ?m]
 		        [(< ?m «since»)]]
-		        ''').map [parseSource(it)].toList()
+		        ''').map [parseSource(database)].toList()
 	}
 
 	def getTopics() {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e topic/hash _]]''').map [parseTopic(it)].toList()
+		 :where [?e topic/hash _]]''').map [parseTopic(database)].toList()
 	}
 	
 	def getTopic(Hash topicHash) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e topic/hash "«topicHash»"]]''').stream().map[parseTopic()].findFirst()
+		 :where [?e topic/hash "«topicHash»"]]''').stream().map[parseTopic(database)].findFirst()
 	}
 
 	def getBlocknumberForTopic(Hash topicHash) {
@@ -217,7 +213,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		parseBlock(queryVector('''
 			[:find [?b ...]
 			 :where [?block block/number «number»]]
-		''').get(0))
+		''').get(0), database)
 	}
 
 	def hasUpvoted(PublicKey key, Hash source, Hash topic) {
@@ -232,13 +228,13 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	def getSources() {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e source/hash _]]''').map[parseSource()]
+		 :where [?e source/hash _]]''').map[parseSource(database)]
 	}
 
 	def getSource(Hash sourceHash) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e source/hash "«sourceHash»"]]''').stream().map[parseSource()].findFirst()
+		 :where [?e source/hash "«sourceHash»"]]''').stream().map[parseSource(database)].findFirst()
 	}
 
 	def getSources(Hash topicHash) {
@@ -246,7 +242,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		[:find [?e ...]
 		 :where [?topic topic/hash "«topicHash»"]
 		        [?topic topic/refers ?reference]
-		        [?e source/hash ?reference]]''').map[parseSource()]
+		        [?e source/hash ?reference]]''').map[parseSource(database)]
 	}
 
 	def getUpvotes(PublicKey key) {
@@ -254,13 +250,13 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		[:find [?upvote ...]
 		 :where [?source source/owner "«key.encoded.toHexString()»"]
 		 		[?source source/hash ?source-hash]
-		 		[?upvote upvote/source ?source-hash]]''').map[parseUpvote()]
+		 		[?upvote upvote/source ?source-hash]]''').map[parseUpvote(database)]
 	}
 
 	def getUpvotes(Hash sourceHash) {
 		queryVector('''
 		[:find [?upvote ...]
-		 :where [?upvote upvote/source "«sourceHash»"]]''').map[parseUpvote()]
+		 :where [?upvote upvote/source "«sourceHash»"]]''').map[parseUpvote(database)]
 	}
 
 	def getUpvote(Hash upvoteHash) {
@@ -271,68 +267,6 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		queryVector('''
 		[:find [?upvote ...]
 		 :where [?upvote upvote/hash "«upvoteHash»"]]''').stream().map[parseUpvote(database)].findFirst()
-	}
-
-	def protected parseAccount(Object blockID) {
-		val entity = database.entity(blockID)
-		val key = CryptoHelper.publicKey((entity.get(":account/key") as String).toByteArray)
-		val username = entity.get(":account/username") as String
-		val credibility = entity.get(":account/credibility") as Double
-		return new Account(key, username, credibility)
-	}
-
-	def protected parseBlock(Object blockID) {
-		val entity = database.entity(blockID)
-		val hash = new Hash(entity.get(":block/hash") as String)
-		val number = entity.get(":block/number") as Long
-		val timestamp = new Date(entity.get("block/time") as Long)
-		val previousBlock = entity.get(":block/previous-block") as String
-		val merkleroot = entity.get(":block/merkleroot") as String
-		val time = entity.get(":block/time") as Long
-		val target = entity.get(":block/target") as String
-		val nonce = entity.get(":block/nonce") as Long
-		val sources = entity.get(":block/added-sources") as Set<String>
-		val topics = entity.get(":block/added-topics") as Set<String>
-
-		val header = new BlockHeader(new Hash(previousBlock), new Hash(merkleroot), new Date(time), new BigInteger(target.toByteArray()), nonce.intValue())
-		return new SavedBlock(hash, number, timestamp, new Block(header, new TreeSet(#[sources.map[parseSource().getSource()], topics.map[parseTopic().getTopic()]])))
-	}
-
-	def protected parseTopic(Object blockID) {
-		val entity = database.entity(blockID)
-		val hash = new Hash(entity.get(":topic/hash") as String)
-		val name = entity.get(":topic/name") as String
-		val description = entity.get(":topic/description") as String
-		val tags = entity.get(":topic/tags") as Set<String>
-		val image = new URL(entity.get(":topic/image") as String)
-		return new SavedTopic(hash, new Topic(name, description, tags, image))
-	}
-
-	def protected parseUpvote(Object blockID) {
-		return parseUpvote(blockID, database)
-	}
-
-	def protected parseUpvote(Object blockID, Database database) {
-		val entity = database.entity(blockID)
-		val hash = new Hash(entity.get(":upvote/hash") as String)
-		val voter = CryptoHelper.publicKey((entity.get(":upvote/voter") as String).toByteArray())
-		val source = new Hash(entity.get(":upvote/source") as String)
-		val topic = new Hash(entity.get(":upvote/topic") as String)
-		return new SavedUpvote(hash, new Upvote(voter, source, topic))
-	}
-
-	def protected parseSource(Object sourceHash) {
-		return parseSource(sourceHash, database)
-	}
-
-	def protected parseSource(Object sourceHash, Database database) {
-		val entity = database.entity(sourceHash)
-		val hash = new Hash(entity.get(":source/hash") as String)
-		val owner = CryptoHelper.publicKey((entity.get(":source/owner") as String).toByteArray())
-		val source = entity.get(":source/source") as String
-		val comment = entity.get(":source/comment") as String
-		val type = entity.get(":source/type") as String
-		return new SavedSource(hash, owner, new Source(SourceType.valueOf(type), new URL(source), comment))
 	}
 
 	def private query(String query) {
