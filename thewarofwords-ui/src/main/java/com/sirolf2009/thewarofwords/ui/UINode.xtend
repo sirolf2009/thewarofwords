@@ -38,7 +38,7 @@ import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 
 @Accessors class UINode extends TheWarOfWordsNode {
 
-	private static final Logger log = LogManager.logger
+	static final Logger log = LogManager.logger
 
 	val List<UpnpService> upnpServices = new ArrayList()
 	val MainController controller

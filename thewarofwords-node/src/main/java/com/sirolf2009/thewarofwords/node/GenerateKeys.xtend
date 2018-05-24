@@ -13,13 +13,13 @@ import picocli.CommandLine.UnmatchedArgumentException
 @Command(description="Generate a public and private key pair")
 @Accessors class GenerateKeys {
 	
-	private static final Logger log = LogManager.logger
+	static final Logger log = LogManager.logger
 
 	@Option(names=#["--private-key"], paramLabel="FILE", description="The private key location")
-	private File privateKey = new File("keys/private.key");
+	File privateKey = new File("keys/private.key");
 
 	@Option(names=#["--public-key"], paramLabel="FILE", description="The public key location")
-	private File publicKey = new File("keys/public.key");
+	File publicKey = new File("keys/public.key");
 
 	def void generate() {
 		privateKey.parentFile.mkdirs()

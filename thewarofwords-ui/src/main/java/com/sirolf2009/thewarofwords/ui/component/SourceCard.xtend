@@ -20,22 +20,24 @@ class SourceCard extends Card {
 	static val filledImage = new Image("images/heart-filled-16.png")
 	
 	val MainController controller
+	val SavedTopic topic
 	val SavedSource source
 
 	new(MainController controller, SavedTopic topic, SavedSource source) {
 		this.controller = controller
+		this.topic = topic
 		this.source = source
 		setHeader(new HBox() => [ container |
 			container.alignment = Pos.TOP_RIGHT
 			container.getChildren().add(new Pane() => [
-				val hasUpvoted = controller.getFacade().hasUpvoted(source.getHash(), topic.getHash())
-				val image = new ImageView(if(hasUpvoted) filledImage else emptyImage) => [
+				val filledHeart = hasUpvoted() || isOwner()
+				val image = new ImageView(if(filledHeart) filledImage else emptyImage) => [
 					fitWidth = 16
 					fitHeight = 16
 					HBox.setHgrow(it, Priority.ALWAYS)
 				]
 				getChildren().add(image)
-				if(!hasUpvoted) {
+				if(!filledHeart) {
 					onMouseClicked = [ e |
 						controller.getFacade().upvote(source.getHash(), topic.getHash())
 						image.setImage(filledImage)
@@ -55,6 +57,20 @@ class SourceCard extends Card {
 				])
 			])
 		])
+		 switch(source.getSource().getSourceType()) {
+		 	case CITATION: setContent(new CitationPane(source.getSource()))
+		 	case TWEET: setContent(new TweetPane(source.getSource()))
+		 	case VIDEO: setContent(new VideoPane(source.getSource()))
+		 	default: setContent(new ArticlePane(source.getSource()))
+		 }
+	}
+	
+	def hasUpvoted() {
+		controller.getFacade().hasUpvoted(source.getHash(), topic.getHash())
+	}
+	
+	def isOwner() {
+		source.getOwner().equals(controller.getNode().getKeys().getPublic())
 	}
 	
 	override setContent(Node node) {

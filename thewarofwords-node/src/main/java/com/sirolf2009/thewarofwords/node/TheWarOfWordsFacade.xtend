@@ -14,7 +14,7 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 
 class TheWarOfWordsFacade {
 	
-	private final TheWarOfWordsNode node
+	final TheWarOfWordsNode node
 	
 	new() {
 		this(new TheWarOfWordsNode(#[new InetSocketAddress("localhost", 2012)], 4567, Keys.generateAssymetricPair()))

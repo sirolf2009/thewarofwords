@@ -1,14 +1,13 @@
 package com.sirolf2009.thewarofwords.ui.component
 
 import com.sirolf2009.thewarofwords.common.model.SavedTopic
-import com.sirolf2009.thewarofwords.common.model.SourceType
 import com.sirolf2009.thewarofwords.ui.MainController
+import com.sirolf2009.thewarofwords.ui.model.Subscription
 import java.util.ArrayList
 import java.util.LinkedList
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.collections.FXCollections
-import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -16,12 +15,10 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.Separator
 import javafx.scene.control.ToggleButton
-import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.tbee.javafx.scene.layout.MigPane
-import com.sirolf2009.thewarofwords.ui.model.Subscription
 
 class TopicOverview extends MigPane {
 
@@ -64,25 +61,7 @@ class TopicOverview extends MigPane {
 		add(new Separator(Orientation.HORIZONTAL), "span, wrap, growx")
 		add(sourcesContainer, "span, grow")
 
-		controller.getFacade().getSources(topic.getHash()).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [ source |
-			if(source.getSource().getSourceType() == SourceType.CITATION) {
-				sources.add(new CitationCard(controller, topic, source) => [
-					FlowPane.setMargin(it, new Insets(4))
-				])
-			} else if(source.getSource().getSourceType() == SourceType.TWEET) {
-				sources.add(new TweetCard(controller, topic, source) => [
-					FlowPane.setMargin(it, new Insets(4))
-				])
-			} else if(source.getSource().getSourceType() == SourceType.VIDEO) {
-				sources.add(new VideoCard(controller, topic, source) => [
-					FlowPane.setMargin(it, new Insets(4))
-				])
-			} else {
-				sources.add(new ArticleCard(controller, topic, source) => [
-					FlowPane.setMargin(it, new Insets(4))
-				])
-			}
-		]
+		controller.getFacade().getSources(topic.getHash()).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [sources.add(new SourceCard(controller, topic, it))]
 
 		val prefWidth = 400
 		widthProperty().addListener [

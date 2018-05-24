@@ -21,11 +21,11 @@ import org.eclipse.xtend.lib.annotations.Data
 
 @Data class Settings {
 	
-	private IntegerProperty hostPort = new SimpleIntegerProperty(4567)
-	private StringProperty trackerIP = new SimpleStringProperty("thewarofwords.com")
-	private IntegerProperty trackerPort = new SimpleIntegerProperty(2012)
-	private BooleanProperty useUpnp = new SimpleBooleanProperty(true)
-	private ListProperty<Subscription> subscriptions = new SimpleListProperty(FXCollections.observableArrayList())
+	IntegerProperty hostPort = new SimpleIntegerProperty(4567)
+	StringProperty trackerIP = new SimpleStringProperty("thewarofwords.com")
+	IntegerProperty trackerPort = new SimpleIntegerProperty(2012)
+	BooleanProperty useUpnp = new SimpleBooleanProperty(true)
+	ListProperty<Subscription> subscriptions = new SimpleListProperty(FXCollections.observableArrayList())
 	
 	def static Settings read(File file) {
 		val flat = new Toml().read(file).to(Simple)
