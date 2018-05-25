@@ -42,11 +42,6 @@
 						</ScrollPane>
 					</content>
 				</Tab>
-				<Tab closable="false" text="Profile">
-					<content>
-						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-					</content>
-				</Tab>
 				<Tab fx:id="settingsTab" closable="false" text="Settings">
 				</Tab>
 				<Tab closable="false" text="Network">

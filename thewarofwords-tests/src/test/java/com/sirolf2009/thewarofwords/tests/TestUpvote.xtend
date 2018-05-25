@@ -50,7 +50,7 @@ class TestUpvote {
 			node2.awaitNewBlock()
 
 			node1.getLastState() => [
-				assertEquals(2, getUpvotes(node1.get().keys.public).size())
+				assertEquals(2, getUpvotes(node1.get().keys.public).count().blockingGet())
 			]
 		} finally {
 			tracker.get()?.closeSafe()

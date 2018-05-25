@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory
 import static extension com.sirolf2009.thewarofwords.common.datomic.ParseExtensions.*
 
 import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
+import io.reactivex.Observable
 
 @Data class State implements IState {
 
@@ -105,10 +106,9 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?e ...]
 			 :where [?e source/hash "«upvote.sourceHash»"]]'''
 			val vector = queryVector(query, connection.db)
-			val sourceOpt = vector.stream().map[parseSource(connection.db)].findFirst()
-			val source = sourceOpt.get()
-			val credit = getCredit(new SavedUpvote(mutation.hash(kryo), upvote), connection.db)
-			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].orElse(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
+			val source = vector.firstOrError().map[parseSource(connection.db)].blockingGet()
+			val credit = getCredit(new SavedUpvote(mutation.hash(kryo), upvote), connection.db).toSingle().blockingGet()
+			val account = source.getOwner().getAccount().map[new Account(key, username, credibility + credit)].blockingGet(new Account(source.getOwner(), source.getOwner().encoded.toHexString(), credit))
 			execute(#['''
 			{:account/key "«account.getKey().encoded.toHexString()»"
 			 :account/username "«account.getUsername()»"
@@ -117,9 +117,9 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 		return new State(connection, connection.db, blockNumber + 1)
 	}
-	
+
 	def getCredit(SavedSource source) {
-		getUpvotes(source.getHash()).stream().map[getCredit()].reduce[a,b|a+b].orElse(0d)
+		getUpvotes(source.getHash()).map[getCredit().blockingGet(0d)].toList().map[reduce[a,b|a+b]]
 	}
 
 	def getCredit(SavedUpvote upvote) {
@@ -133,16 +133,16 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 		 		[?upvote upvote/source "«upvote.getUpvote().getSourceHash()»"]
 		 		[?upvote upvote/hash "«upvote.getHash()»"]]'''
 		val vector = queryVector(query, database)
-		val sourceOpt = vector.stream().map[parseSource(database)].findFirst()
-		val source = sourceOpt.orElseThrow[new RuntimeException("Could not find source accompanying "+upvote)]
-		return switch (source.getSource().getSourceType()) {
-			case TRUSTED: 100
-			case CITATION: 80
-			case VIDEO: 60
-			case ARTICLE: 40
-			case TWEET: 20
-		} * getAccount(upvote.getUpvote().getVoter()).map[1 + credibility / 100].orElse(1d)
-		//TODO when in prod, a certain amount of credibility must already be assigned before credit counts
+		vector.firstElement().map[parseSource(database)].map [
+			return switch (getSource().getSourceType()) {
+				case TRUSTED: 100
+				case CITATION: 80
+				case VIDEO: 60
+				case ARTICLE: 40
+				case TWEET: 20
+			} * getAccount(upvote.getUpvote().getVoter()).map[1 + credibility / 100].blockingGet(1d)
+		]
+	// TODO when in prod, a certain amount of credibility must already be assigned before credit counts
 	}
 
 	override toString() {
@@ -152,7 +152,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	def getAccount(PublicKey account) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e account/key "«account.encoded.toHexString()»"]]''').stream().map[parseAccount(database)].findFirst()
+		 :where [?e account/key "«account.encoded.toHexString()»"]]''').firstElement().map[parseAccount(database)]
 	}
 
 	def private execute(Iterable<String> queries) {
@@ -172,25 +172,25 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 
 	def getSourcesForTopicSince(Hash topicHash, long since) {
 		queryVector('''
-		[:find [?e ...]
-		 :where [?t topic/hash "«topicHash»"]
-		        [?t topic/refers ?e]
-		        [?b block/added-sources ?e]
-		        [?b block/time ?m]
-		        [(< ?m «since»)]]
-		        ''').map [parseSource(database)].toList()
+			[:find [?e ...]
+			 :where [?t topic/hash "«topicHash»"]
+			        [?t topic/refers ?e]
+			        [?b block/added-sources ?e]
+			        [?b block/time ?m]
+			        [(< ?m «since»)]]
+		       ''').map[parseSource(database)]
 	}
 
 	def getTopics() {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e topic/hash _]]''').map [parseTopic(database)].toList()
+		 :where [?e topic/hash _]]''').map[parseTopic(database)]
 	}
-	
+
 	def getTopic(Hash topicHash) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e topic/hash "«topicHash»"]]''').stream().map[parseTopic(database)].findFirst()
+		 :where [?e topic/hash "«topicHash»"]]''').firstElement().map[parseTopic(database)]
 	}
 
 	def getBlocknumberForTopic(Hash topicHash) {
@@ -198,7 +198,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?b ...]
 			 :where [?block block/added-topics "«topicHash»"]
 			 		[?block block/number ?b]]
-		''').get(0) as Long
+		''').firstElement().map[it as Long]
 	}
 
 	def getBlocknumberForSource(Hash sourceHash) {
@@ -206,14 +206,14 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			[:find [?b ...]
 			 :where [?block block/added-sources "«sourceHash»"]
 			 		[?block block/number ?b]]
-		''').get(0) as Long
+		''').firstElement().map[it as Long]
 	}
 
 	def getBlock(long number) {
-		parseBlock(queryVector('''
+		queryVector('''
 			[:find [?b ...]
 			 :where [?block block/number «number»]]
-		''').get(0), database)
+		''').firstElement().map[parseBlock(database)]
 	}
 
 	def hasUpvoted(PublicKey key, Hash source, Hash topic) {
@@ -222,7 +222,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 			 :where [?t upvote/voter "«key.encoded.toHexString()»"]
 			 		[?t upvote/topic "«topic»"]
 			 		[?t upvote/source "«source»"]]
-		''').size() > 0
+		''').isEmpty().map[!it]
 	}
 
 	def getSources() {
@@ -234,7 +234,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	def getSource(Hash sourceHash) {
 		queryVector('''
 		[:find [?e ...]
-		 :where [?e source/hash "«sourceHash»"]]''').stream().map[parseSource(database)].findFirst()
+		 :where [?e source/hash "«sourceHash»"]]''').firstElement().map[parseSource(database)]
 	}
 
 	def getSources(Hash topicHash) {
@@ -266,7 +266,7 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	def getUpvote(Hash upvoteHash, Database database) {
 		queryVector('''
 		[:find [?upvote ...]
-		 :where [?upvote upvote/hash "«upvoteHash»"]]''').stream().map[parseUpvote(database)].findFirst()
+		 :where [?upvote upvote/hash "«upvoteHash»"]]''').firstElement().map[parseUpvote(database)]
 	}
 
 	def private query(String query) {
@@ -274,8 +274,17 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	}
 
 	def private static query(String query, Database database) {
-		log.debug("Executing query {}", query)
-		return Peer.query(query, database) as HashSet<PersistentVector>
+		Observable.create [
+			try {
+				log.debug("Executing query {}", query)
+				(Peer.query(query, database) as HashSet<PersistentVector>).forEach [ item |
+					onNext(item)
+				]
+				onComplete()
+			} catch(Exception e) {
+				onError(e)
+			}
+		]
 	}
 
 	def private queryVector(String query) {
@@ -283,8 +292,17 @@ import static extension com.sirolf2009.objectchain.common.crypto.Hashing.*
 	}
 
 	def private static queryVector(String query, Database database) {
-		log.debug("Executing query {}", query)
-		return Peer.query(query, database) as PersistentVector
+		Observable.create [
+			try {
+				log.debug("Executing query {}", query)
+				(Peer.query(query, database) as PersistentVector).forEach [ item |
+					onNext(item)
+				]
+				onComplete()
+			} catch(Exception e) {
+				onError(e)
+			}
+		]
 	}
 
 }

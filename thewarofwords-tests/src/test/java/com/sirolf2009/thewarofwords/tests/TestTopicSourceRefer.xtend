@@ -50,8 +50,8 @@ class TestTopicSourceRefer {
 
 			node2.getLastState() => [
 				val sources = getSources(node2.get().hash(specificProject))
-				assertEquals("There is only 1 source in " + sources, 1, sources.size())
-				assertEquals("https://github.com/sirolf2009/thewarofwords", sources.get(0).getSource().getSource().toString())
+				assertEquals("There is only 1 source in " + sources, 1, sources.count().blockingGet())
+				assertEquals("https://github.com/sirolf2009/thewarofwords", sources.firstOrError().blockingGet().getSource().getSource().toString())
 			]
 
 		} finally {

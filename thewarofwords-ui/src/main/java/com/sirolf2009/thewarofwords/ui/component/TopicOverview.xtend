@@ -46,7 +46,7 @@ class TopicOverview extends MigPane {
 		add(new HBox(8) => [
 			getChildren().add(new ToggleButton("Subscribe") => [
 				textProperty().bind(Bindings.when(selectedProperty()).then("Subscribed").otherwise("Subscribe"))
-				selectedProperty().addListener [evt|
+				selectedProperty().addListener [ evt |
 					if(isSelected()) {
 						controller.getSettings().getSubscriptions().add(new Subscription(topic.getHash(), controller.getNode().getLastBlock().get()))
 					} else {
@@ -61,7 +61,7 @@ class TopicOverview extends MigPane {
 		add(new Separator(Orientation.HORIZONTAL), "span, wrap, growx")
 		add(sourcesContainer, "span, grow")
 
-		controller.getFacade().getSources(topic.getHash()).sortBy[controller.getFacade().getCredit(it)].reverse().forEach [sources.add(new SourceCard(controller, topic, it))]
+		controller.getFacade().getSources(topic.getHash()).toList().map[sortBy[controller.getFacade().getCredit(it).blockingGet()].reverse()].subscribe[forEach[sources.add(new SourceCard(controller, topic, it))]]
 
 		val prefWidth = 400
 		widthProperty().addListener [

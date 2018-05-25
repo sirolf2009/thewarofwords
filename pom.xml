@@ -12,8 +12,8 @@
 		<module>thewarofwords-node</module>
 		<module>thewarofwords-miner</module>
 		<module>thewarofwords-tests</module>
-    	<module>thewarofwords-ui</module>
-  </modules>
+		<module>thewarofwords-ui</module>
+	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,6 +32,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.reactivex.rxjava2</groupId>
+			<artifactId>rxjava</artifactId>
+			<version>2.1.14</version>
 		</dependency>
 	</dependencies>
 

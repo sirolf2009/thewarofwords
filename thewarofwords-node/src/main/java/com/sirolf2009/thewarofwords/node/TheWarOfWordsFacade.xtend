@@ -85,7 +85,7 @@ class TheWarOfWordsFacade {
 	}
 	
 	def getUpvoteCount(Hash sourceHash) {
-		return state.getUpvotes(sourceHash).size()
+		return state.getUpvotes(sourceHash).count()
 	}
 	
 	def getCredit(SavedSource source) {

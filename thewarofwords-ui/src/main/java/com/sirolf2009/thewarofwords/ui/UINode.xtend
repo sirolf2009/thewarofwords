@@ -35,6 +35,7 @@ import com.sirolf2009.thewarofwords.ui.model.Subscription
 import org.controlsfx.control.Notifications
 import org.controlsfx.control.action.Action
 import com.sirolf2009.thewarofwords.ui.component.TopicOverview
+import io.reactivex.Single
 
 @Accessors class UINode extends TheWarOfWordsNode {
 
@@ -62,7 +63,7 @@ import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 		if(settings.useUpnp.get()) {
 			upnpPort(nodePort)
 		}
-		settings.useUpnp.addListener[obs,oldVal,newVal|
+		settings.useUpnp.addListener [ obs, oldVal, newVal |
 			if(newVal) {
 				upnpPort(nodePort)
 			} else {
@@ -91,23 +92,27 @@ import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 	override onBlockchainExpanded() {
 		val block = blockchain.mainBranch.getLastBlock()
 		val hash = hash(block)
-		block.getMutations().map[getObject()].forEach[
+		block.getMutations().map[getObject()].forEach [
 			if(it instanceof Reference) {
 				val topic = getTopic()
-				settings.getSubscriptions().filter[getTopicHash().equals(topic)].toList().forEach[
+				settings.getSubscriptions().filter[getTopicHash().equals(topic)].toList().forEach [
 					settings.getSubscriptions().remove(it)
 					settings.getSubscriptions().add(new Subscription(getTopicHash(), hash))
-					
+
 					val state = blockchain.mainBranch.lastState as State
-					state.getTopic(getTopicHash()).ifPresent[
+					state.getTopic(getTopicHash()).subscribe([
 						Notifications.create().title(getTopic().getName()).text("New source has been submitted").action(new Action("Show", [evt|controller.setNewsContent(new TopicOverview(controller, it))])).show()
-					]
+					], [printStackTrace()])
 				]
 			}
 		]
 		Platform.runLater [
 			lastBlock.set(hash)
-			credibility.set((blockchain.mainBranch.getLastState() as State).getAccount(getKeys().public).map[it.getCredibility()].orElse(0d))
+		]
+		(blockchain.mainBranch.getLastState() as State).getAccount(getKeys().public).map[it.getCredibility()].switchIfEmpty(Single.create([onSuccess(0d)])).subscribe [
+			Platform.runLater [
+				credibility.set(it)
+			]
 		]
 	}
 
@@ -122,9 +127,9 @@ import com.sirolf2009.thewarofwords.ui.component.TopicOverview
 			val addrItr = interface.inetAddresses
 			while(addrItr.hasMoreElements()) {
 				val address = addrItr.nextElement().toString()
-				if(address.startsWith("192.168") || address.startsWith("192.178.")  || address.startsWith("10.")) {
+				if(address.startsWith("192.168") || address.startsWith("192.178.") || address.startsWith("10.")) {
 					upnpPort(address, port)
-				} else if(address.startsWith("/192.168") || address.startsWith("/192.178.")  || address.startsWith("/10.")) {
+				} else if(address.startsWith("/192.168") || address.startsWith("/192.178.") || address.startsWith("/10.")) {
 					upnpPort(address.substring(1), port)
 				}
 			}

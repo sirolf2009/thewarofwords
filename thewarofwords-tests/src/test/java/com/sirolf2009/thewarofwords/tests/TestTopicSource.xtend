@@ -40,18 +40,20 @@ class TestTopicSource {
 			node2.awaitNewBlock()
 
 			node2.getLastState() => [
-				assertEquals(topics.toString(), 1, topics.size())
-				assertEquals(topics.toString(), "Test Topic", topics.get(0).getTopic().getName())
-				assertEquals(topics.toString(), "description", topics.get(0).getTopic().getDescription())
-				val tags = topics.get(0).getTopic().getTags()
+				assertEquals(topics.toString(), 1, getTopics().count().blockingGet())
+				val topic = getTopics().firstOrError().blockingGet()
+				assertEquals(topics.toString(), "Test Topic", topic.getTopic().getName())
+				assertEquals(topics.toString(), "description", topic.getTopic().getDescription())
+				val tags = topic.getTopic().getTags()
 				assertEquals(tags.toString(), 2, tags.size())
 				assertTrue(tags.toString(), tags.contains("test"))
 				assertTrue(tags.toString(), tags.contains("topic"))
 
-				assertEquals(sources.toString(), 1, sources.size())
-				assertEquals(sources.toString(), SourceType.ARTICLE, sources.get(0).getSource().sourceType)
-				assertEquals(sources.toString(), "https://github.com/sirolf2009/thewarofwords", sources.get(0).getSource().getSource().toString())
-				assertEquals(sources.toString(), "All you're base are belong to us", sources.get(0).getSource().getComment())
+				assertEquals(sources.toString(), 1, getSources().count().blockingGet())
+				val source = getSources().firstOrError().blockingGet()
+				assertEquals(sources.toString(), SourceType.ARTICLE, source.getSource().sourceType)
+				assertEquals(sources.toString(), "https://github.com/sirolf2009/thewarofwords", source.getSource().getSource().toString())
+				assertEquals(sources.toString(), "All you're base are belong to us", source.getSource().getComment())
 			]
 		} finally {
 			tracker.get()?.closeSafe()

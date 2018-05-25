@@ -33,6 +33,10 @@ import javafx.util.Duration
 import org.apache.commons.beanutils.PropertyUtils
 import org.apache.logging.log4j.LogManager
 import org.eclipse.xtend.lib.annotations.Accessors
+import javafx.scene.layout.VBox
+import javafx.scene.control.ProgressIndicator
+import javafx.geometry.Pos
+import com.sirolf2009.objectchain.common.exception.TrackerUnreachableException
 
 class MainController {
 
@@ -54,7 +58,28 @@ class MainController {
 	def void initialize() {
 		node = new UINode(this, #[new InetSocketAddress(settings.getTrackerIP().getValue(), settings.getTrackerPort().getValue())], settings.getHostPort().getValue(), getKeys())
 		facade = new TheWarOfWordsFacade(node)
-		new Thread[node.start()] => [
+		
+		val loaderIndicator = new VBox(new ProgressIndicator(), new Label("Connecting. Please wait...")) => [
+			styleClass += "newsContentItem"
+			alignment = Pos.CENTER
+		]
+		setNewsContent(loaderIndicator)
+		node.getIsSynchronised.addListener [
+			newsContent.getChildren().remove(loaderIndicator)
+		]
+		
+		new Thread [
+			try {
+				node.start()
+			} catch(TrackerUnreachableException e) {
+				newsContent.getChildren().clear()
+				setNewsContent(new VBox(new Label("Could not connect to tracker: "+e.getMessage())) => [
+					styleClass += "newsContentItem"
+					alignment = Pos.CENTER
+				])
+				log.error("Failed to connect to tracker", e)
+			}
+		] => [
 			daemon = true
 			name = "Node"
 			start()

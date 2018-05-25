@@ -30,8 +30,8 @@ class TestState {
 		val state = emptyState()
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet())
 		val newState = state.apply(kryo(), block) as State
-		assertTrue(newState.getTopics().empty)
-		assertTrue(newState.getSources().empty)
+		assertTrue(newState.getTopics().isEmpty().blockingGet())
+		assertTrue(newState.getSources().isEmpty().blockingGet())
 	}
 
 	@Test
@@ -43,8 +43,8 @@ class TestState {
 		val newState1 = state.apply(kryo(), block1) as State
 		val newState2 = newState1.apply(kryo(), block2) as State
 		val newState3 = newState2.apply(kryo(), block3) as State
-		assertTrue(newState3.getTopics().empty)
-		assertTrue(newState3.getSources().empty)
+		assertTrue(newState3.getTopics().isEmpty().blockingGet())
+		assertTrue(newState3.getSources().isEmpty().blockingGet())
 		assertEquals(3, newState3.blockNumber)
 	}
 	
@@ -54,12 +54,12 @@ class TestState {
 		val topic = new Mutation(new Topic("Topic", "description", #["a", "b", "c"].toSet(), new URL("http://www.thewarofwords.com")), kryo(), Keys.generateAssymetricPair())
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet(#[topic]))
 		val newState = state.apply(kryo(), block) as State
-		assertFalse(newState.getTopics().empty)
-		val newStateTopic = newState.getTopics().findFirst[getHash().equals(topic.hash(kryo()))].getTopic()
+		assertFalse(newState.getTopics().isEmpty().blockingGet())
+		val newStateTopic = newState.getTopics().filter[getHash().equals(topic.hash(kryo()))].firstOrError().blockingGet().getTopic()
 		assertEquals("Topic", newStateTopic.name)
 		assertEquals("description", newStateTopic.description)
 		assertEquals(#["a", "b", "c"].toSet(), newStateTopic.tags)
-		assertTrue(newState.getSources().empty)
+		assertTrue(newState.getSources().isEmpty().blockingGet())
 	}
 	
 	@Test
@@ -69,12 +69,13 @@ class TestState {
 		val source = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009/thewarofwords"), "comment"), kryo(), keys)
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet(#[source]))
 		val newState = state.apply(kryo(), block) as State
-		assertTrue(newState.getTopics().empty)
-		assertFalse(newState.getSources().empty)
-		assertEquals(keys.public, newState.getSource(source.hash(kryo())).get().getOwner())
-		assertEquals(SourceType.ARTICLE, newState.getSource(source.hash(kryo())).get().getSource().getSourceType())
-		assertEquals("https://www.github.com/sirolf2009/thewarofwords", newState.getSource(source.hash(kryo())).get().getSource().getSource().toExternalForm())
-		assertEquals("comment", newState.getSource(source.hash(kryo())).get().getSource().getComment())
+		assertTrue(newState.getTopics().isEmpty().blockingGet())
+		assertFalse(newState.getSources().isEmpty().blockingGet())
+		val persistedSource = newState.getSource(source.hash(kryo())).toSingle().blockingGet()
+		assertEquals(keys.public, persistedSource.getOwner())
+		assertEquals(SourceType.ARTICLE, persistedSource.getSource().getSourceType())
+		assertEquals("https://www.github.com/sirolf2009/thewarofwords", persistedSource.getSource().getSource().toExternalForm())
+		assertEquals("comment", persistedSource.getSource().getComment())
 	}
 	
 	@Test
@@ -85,9 +86,9 @@ class TestState {
 		val source2 = new Mutation(new Source(SourceType.ARTICLE, new URL("https://www.github.com/sirolf2009/objectchain"), "comment"), kryo(), keys)
 		val block = new Block(new BlockHeader(new Hash(#[]), new Hash(#[]), new Date(), BigInteger.ONE, 0), new TreeSet(#[source1, source2]))
 		val newState = state.apply(kryo(), block) as State
-		assertTrue(newState.getTopics().empty)
-		assertFalse(newState.getSources().empty)
-		assertEquals(2, newState.getSources().size())
+		assertTrue(newState.getTopics().isEmpty().blockingGet())
+		assertFalse(newState.getSources().isEmpty().blockingGet())
+		assertEquals(2, newState.getSources().count().blockingGet())
 	}
 	
 	@Test
@@ -101,7 +102,7 @@ class TestState {
 		])
 		block.mutations.add(new Mutation(new Reference(topic.hash(kryo()), source.hash(kryo())), kryo(), keys))
 		val newState = state.apply(kryo(), block) as State
-		assertEquals(source.hash(kryo()), newState.getSources(topic.hash(kryo())).get(0).getHash())
+		assertEquals(source.hash(kryo()), newState.getSources(topic.hash(kryo())).firstOrError().blockingGet().getHash())
 	}
 	
 	@Test

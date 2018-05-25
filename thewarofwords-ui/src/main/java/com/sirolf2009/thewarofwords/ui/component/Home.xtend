@@ -4,19 +4,17 @@ import com.sirolf2009.thewarofwords.common.model.SavedSource
 import com.sirolf2009.thewarofwords.common.model.SavedTopic
 import com.sirolf2009.thewarofwords.ui.MainController
 import com.sirolf2009.thewarofwords.ui.model.Subscription
-import java.time.Duration
 import java.util.Date
 import java.util.List
-import java.util.stream.Collectors
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Rectangle2D
 import javafx.scene.Node
+import javafx.scene.control.ProgressIndicator
 import javafx.scene.control.ScrollPane
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
 import org.eclipse.xtend.lib.annotations.Data
-import javafx.scene.control.ProgressIndicator
 
 class Home extends ScrollPane {
 
@@ -43,23 +41,30 @@ class Home extends ScrollPane {
 			val vp = bannerImg.viewport
 			bannerImg.viewport = new Rectangle2D(vp.minX, vp.minY, bannerImg.image.width, (bannerImg.image.height / width) * 145 + 145)
 		]
+		
 		#[recentTopics, creditTopics, sourceTopics, subscribedTopics, upvotedSources].forEach[set(new ProgressIndicator())]
-		loadTopicsInto(recentTopics) [
-			controller.getFacade().getTopics().stream().limit(10).collect(Collectors.toList())
+		
+		controller.getFacade().getTopics().take(10).toList().subscribe [
+			recentTopics.set(new TopicsOverview(controller, it))
 		]
-		loadTopicsInto(creditTopics) [
-			controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).map[controller.getFacade().getCredit(it)].stream().reduce[a, b|a + b].orElse(0d)].reverse().stream().limit(10).collect(Collectors.toList())
+		
+		controller.getFacade().getTopics().toList().map[sortBy[
+			controller.getFacade().getSources(getHash()).map[controller.getFacade().getCredit(it).blockingGet()].toList().map[reduce[a,b|a+b]].blockingGet()
+		].reverse().take(10).toList()].subscribe [
+			creditTopics.set(new TopicsOverview(controller, it))
 		]
-		loadTopicsInto(sourceTopics) [
-			controller.getFacade().getTopics().sortBy[controller.getFacade().getSources(getHash()).size()].reverse().stream().limit(10).collect(Collectors.toList())
+		
+		controller.getFacade().getTopics().toList().map[sortBy[controller.getFacade().getSources(getHash()).count().blockingGet()].reverse().take(10).toList()].subscribe [
+			sourceTopics.set(new TopicsOverview(controller, it))
 		]
-		loadTopicsInto(subscribedTopics) [
-			controller.getSettings().getSubscriptions().stream().map[it -> controller.getFacade().getSourcesForTopicSince(getTopicHash(), System.currentTimeMillis() - Duration.ofDays(7).toMillis())].filter[value.size() > 0].flatMap [
-				value.stream().map [ source |
-					new SubscribedSource(key, controller.getFacade().getTopic(key.getTopicHash()).get(), source, controller.getFacade().getBlock(controller.getFacade().getBlockNumberForSource(source.getHash())).getTimestamp())
-				]
-			].sorted[a, b|a.getTimestamp().compareTo(b.getTimestamp())].map[topic].distinct().limit(10).collect(Collectors.toList())
-		]
+		
+//		loadTopicsInto(subscribedTopics) [
+//			controller.getSettings().getSubscriptions().stream().map[it -> controller.getFacade().getSourcesForTopicSince(getTopicHash(), System.currentTimeMillis() - Duration.ofDays(7).toMillis())].filter[value.size() > 0].flatMap [
+//				value.stream().map [ source |
+//					new SubscribedSource(key, controller.getFacade().getTopic(key.getTopicHash()).get(), source, controller.getFacade().getBlock(controller.getFacade().getBlockNumberForSource(source.getHash())).getTimestamp())
+//				]
+//			].sorted[a, b|a.getTimestamp().compareTo(b.getTimestamp())].map[topic].distinct().limit(10).collect(Collectors.toList())
+//		]
 	}
 
 	def loadTopicsInto(AnchorPane pane, ()=>List<SavedTopic> supplier) {
